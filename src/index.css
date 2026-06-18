@@ -331,6 +331,7 @@ input, select, textarea { font-family: inherit; }
   font-weight: 500;
   transition: transform var(--dur-hover), background var(--dur-hover), border-color var(--dur-hover);
   width: 100%;
+  white-space: nowrap;
 }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--vinna-rust); color: var(--vinna-raw); }

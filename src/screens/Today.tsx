@@ -73,9 +73,15 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
                 Across your last few cycles your check-ins show stronger Day 1 fatigue than the months before. It is not
                 a diagnosis — just something a clinician might want to know. Vinna can prepare a short summary you can bring.
               </p>
-              <div className="row" style={{ marginTop: 16, gap: 10 }}>
+              <div style={{ marginTop: 16 }}>
                 <Btn sm variant="primary" onClick={() => toast('Summary saved to You → Health intelligence.')}>Prepare summary →</Btn>
-                <Btn sm variant="ghost" onClick={() => setNudgeDismissed(true)}>Not relevant for me</Btn>
+                <button
+                  className="btn-ghost"
+                  style={{ display: 'block', marginTop: 12, fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, color: 'var(--fg-3)' }}
+                  onClick={() => setNudgeDismissed(true)}
+                >
+                  Not relevant for me
+                </button>
               </div>
             </div>
           )}
