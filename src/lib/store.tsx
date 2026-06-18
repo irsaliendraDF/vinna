@@ -95,18 +95,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (s && active) {
           const u: AppUser = { id: s.user.id, email: s.user.email ?? '', isDemo: false }
           setUser(u); hydrate(u)
-        } else {
-          const guest = localStorage.getItem('vinna_guest')
-          if (guest && active) { const u = JSON.parse(guest); setUser(u); hydrate(u) }
         }
+        // Note: we intentionally do NOT auto-restore the guest/demo session.
+        // Every fresh visit starts on the welcome screen so the full journey
+        // (tour + sign-in choice) always shows. Only a real Supabase session
+        // keeps a returning, signed-in user logged in.
         supabase.auth.onAuthStateChange((_e, sess) => {
           if (!sess) return
           const u: AppUser = { id: sess.user.id, email: sess.user.email ?? '', isDemo: false }
           setUser(u); hydrate(u)
         })
-      } else {
-        const guest = localStorage.getItem('vinna_guest')
-        if (guest && active) { const u = JSON.parse(guest); setUser(u); hydrate(u) }
       }
       if (active) setReady(true)
     }
