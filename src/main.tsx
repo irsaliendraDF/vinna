@@ -4,6 +4,8 @@ import { AppProvider } from './lib/store'
 import App from './App'
 import './index.css'
 
+// Build marker: connect to Supabase backend (live auth + database)
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppProvider>
