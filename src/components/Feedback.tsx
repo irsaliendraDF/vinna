@@ -2,30 +2,92 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../lib/store'
 import { Eyebrow, Btn, Sheet } from './ui'
 
-/* Build-useful signal:
-   fit       -> does Vinna solve a real need (product-market fit signal)
-   mustHave  -> which capabilities would make it a daily habit (roadmap priority)
-   message   -> the single most important thing in the tester's own words
+/* Two distinct surveys so testers are asked something fresh on each surface.
+   Both store into the same columns (fit = single choice, must_have = multi
+   choice, message = open text); the `context` value ('today' | 'you') tells you
+   which survey a row came from.
+
+   today -> product fit & roadmap (does it meet a need, what to build next)
+   you   -> experience & retention (would they stay, recommend, what is missing)
 */
-const FIT = [
-  { key: 'strong', label: 'A strong fit' },
-  { key: 'maybe', label: 'Could be, with work' },
-  { key: 'not_yet', label: 'Not yet' },
-]
+type Survey = {
+  single: { label: string; options: { key: string; label: string }[] }
+  multi: { label: string; options: string[] }
+  open: { label: string; placeholder: string }
+}
 
-const MUST_HAVE = [
-  'Cycle & symptom tracking',
-  'Activity sync (Strava, Oura)',
-  'Food & nutrition guidance',
-  'Menopause & perimenopause support',
-  'Sharing with partner or care team',
-  'Trustworthy health answers',
-  'Reminders & screenings',
-  'Something else',
-]
+const SURVEYS: Record<string, Survey> = {
+  today: {
+    single: {
+      label: 'How well does Vinna fit a real need in your life?',
+      options: [
+        { key: 'strong', label: 'A strong fit' },
+        { key: 'maybe', label: 'Could be, with work' },
+        { key: 'not_yet', label: 'Not yet' },
+      ],
+    },
+    multi: {
+      label: 'What would make Vinna a daily must-have for you? Pick any.',
+      options: [
+        'Cycle & symptom tracking',
+        'Activity sync (Strava, Oura)',
+        'Food & nutrition guidance',
+        'Menopause & perimenopause support',
+        'Sharing with partner or care team',
+        'Trustworthy health answers',
+        'Reminders & screenings',
+        'Something else',
+      ],
+    },
+    open: {
+      label: 'In your words, what is the one thing Vinna must get right for you?',
+      placeholder: 'The thing that would make or break it for you.',
+    },
+  },
+  you: {
+    single: {
+      label: 'Now that you have looked around, how likely are you to keep using Vinna?',
+      options: [
+        { key: 'daily', label: 'I would use it daily' },
+        { key: 'sometimes', label: 'Now and then' },
+        { key: 'unlikely', label: 'Probably not yet' },
+      ],
+    },
+    multi: {
+      label: 'What would make you recommend Vinna to a friend? Pick any.',
+      options: [
+        'Easier to find my way around',
+        'More personalized to me',
+        'Proof the guidance is trustworthy',
+        'A fair price',
+        'Works with my other apps',
+        'More control over my data',
+        'Something else',
+      ],
+    },
+    open: {
+      label: 'What is missing before Vinna becomes part of your routine?',
+      placeholder: 'The thing that would keep you coming back.',
+    },
+  },
+}
 
-function FeedbackSurvey({ context, onSent }: { context: string; onSent: () => void }) {
+const PROMPT_COPY: Record<string, { eyebrow: string; title: string; intro: string }> = {
+  today: {
+    eyebrow: '● Help shape Vinna',
+    title: 'Build Vinna with us',
+    intro: 'You are one of our first testers. A few quick taps tell us how to make Vinna genuinely useful for you.',
+  },
+  you: {
+    eyebrow: '● Your experience',
+    title: 'How is Vinna working for you?',
+    intro: 'You have had a look around. Tell us how it feels to use, and what would keep you coming back.',
+  },
+}
+
+function FeedbackSurvey({ variant, context, onSent }: { variant: string; context: string; onSent: () => void }) {
   const { submitFeedback } = useApp()
+  const survey = SURVEYS[variant] ?? SURVEYS.today
   const [fit, setFit] = useState<string | null>(null)
   const [mustHave, setMustHave] = useState<string[]>([])
   const [message, setMessage] = useState('')
@@ -46,10 +108,10 @@ function FeedbackSurvey({ context, onSent }: { context: string; onSent: () => vo
   return (
     <div className="stack" style={{ marginTop: 4 }}>
       <div>
-        <p className="v-label" style={{ marginBottom: 10 }}>How well does Vinna fit a real need in your life?</p>
+        <p className="v-label" style={{ marginBottom: 10 }}>{survey.single.label}</p>
         <div className="row wrap" style={{ gap: 8 }}>
-          {FIT.map(f => (
-            <button key={f.key} className={`chip ${fit === f.key ? 'on' : ''}`} onClick={() => setFit(f.key)}>{f.label}</button>
+          {survey.single.options.map(o => (
+            <button key={o.key} className={`chip ${fit === o.key ? 'on' : ''}`} onClick={() => setFit(o.key)}>{o.label}</button>
           ))}
         </div>
       </div>
@@ -57,20 +119,20 @@ function FeedbackSurvey({ context, onSent }: { context: string; onSent: () => vo
       {fit && (
         <>
           <div className="reveal">
-            <p className="v-label" style={{ marginBottom: 10 }}>What would make Vinna a daily must-have for you? Pick any.</p>
+            <p className="v-label" style={{ marginBottom: 10 }}>{survey.multi.label}</p>
             <div className="row wrap" style={{ gap: 8 }}>
-              {MUST_HAVE.map(m => (
+              {survey.multi.options.map(m => (
                 <button key={m} className={`chip ${mustHave.includes(m) ? 'on' : ''}`} onClick={() => toggle(m)}>{m}</button>
               ))}
             </div>
           </div>
 
           <div className="reveal">
-            <p className="v-label" style={{ marginBottom: 10 }}>In your words, what is the one thing Vinna must get right for you?</p>
+            <p className="v-label" style={{ marginBottom: 10 }}>{survey.open.label}</p>
             <textarea
               className="field"
               rows={3}
-              placeholder="The thing that would make or break it for you."
+              placeholder={survey.open.placeholder}
               value={message}
               onChange={e => setMessage(e.target.value)}
               style={{ resize: 'none' }}
@@ -97,11 +159,12 @@ function ThankYou({ onClose }: { onClose?: () => void }) {
 }
 
 /* Auto-opens 3 seconds after a screen loads, once per session per slot.
-   Used on Today (slot="today") and the You tab (slot="you"). Once feedback is
-   submitted anywhere it never auto-opens again. */
+   Used on Today (slot="today") and the You tab (slot="you"), each with its own
+   survey. Once feedback is submitted anywhere it never auto-opens again. */
 export function FeedbackAutoPrompt({ toast, slot = 'today' }: { toast: (m: string) => void; slot?: string }) {
   const [open, setOpen] = useState(false)
   const [done, setDone] = useState(false)
+  const copy = PROMPT_COPY[slot] ?? PROMPT_COPY.today
 
   useEffect(() => {
     try {
@@ -119,16 +182,15 @@ export function FeedbackAutoPrompt({ toast, slot = 'today' }: { toast: (m: strin
 
   return (
     <Sheet open={open} onClose={close} highlight>
-      <Eyebrow>● Help shape Vinna</Eyebrow>
-      <h2 className="v-h2" style={{ margin: '10px 0 6px' }}>Build Vinna with us</h2>
-      <p className="v-meta" style={{ marginBottom: 18 }}>
-        You are one of our first testers. A few quick taps tell us how to make Vinna genuinely useful for you.
-      </p>
+      <Eyebrow>{copy.eyebrow}</Eyebrow>
+      <h2 className="v-h2" style={{ margin: '10px 0 6px' }}>{copy.title}</h2>
+      <p className="v-meta" style={{ marginBottom: 18 }}>{copy.intro}</p>
       {done ? (
         <ThankYou onClose={close} />
       ) : (
         <>
           <FeedbackSurvey
+            variant={slot}
             context={slot}
             onSent={() => { setDone(true); try { localStorage.setItem('vinna_feedback_done', '1') } catch { /* ignore */ } toast('Feedback sent. Thank you.') }}
           />
@@ -145,7 +207,7 @@ export function FeedbackAutoPrompt({ toast, slot = 'today' }: { toast: (m: strin
   )
 }
 
-/* Hot spot 2: always-available sheet, opened from the You tab. */
+/* Always-available sheet, opened from the You tab. Uses the You survey. */
 export function FeedbackSheet({ open, onClose, toast }: { open: boolean; onClose: () => void; toast: (m: string) => void }) {
   const [done, setDone] = useState(false)
   useEffect(() => { if (open) setDone(false) }, [open])
@@ -160,6 +222,7 @@ export function FeedbackSheet({ open, onClose, toast }: { open: boolean; onClose
         <ThankYou onClose={onClose} />
       ) : (
         <FeedbackSurvey
+          variant="you"
           context="you"
           onSent={() => { setDone(true); try { localStorage.setItem('vinna_feedback_done', '1') } catch { /* ignore */ } toast('Feedback sent. Thank you.') }}
         />
