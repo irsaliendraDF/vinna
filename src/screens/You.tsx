@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApp } from '../lib/store'
 import { TopBar } from '../components/TopBar'
 import { Eyebrow, Badge, Btn, Sheet } from '../components/ui'
-import { FeedbackSheet } from '../components/Feedback'
+import { FeedbackSheet, FeedbackAutoPrompt } from '../components/Feedback'
 import { PatternCard } from './Track'
 import { herbs, recipes, patterns, moodMeta } from '../lib/data'
 
@@ -153,6 +153,9 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
       </Sheet>
 
       <FeedbackSheet open={feedback} onClose={() => setFeedback(false)} toast={toast} />
+
+      {/* auto-opens 3s after the You tab loads, once per session */}
+      <FeedbackAutoPrompt slot="you" toast={toast} />
     </>
   )
 }

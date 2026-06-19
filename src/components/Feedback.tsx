@@ -96,27 +96,29 @@ function ThankYou({ onClose }: { onClose?: () => void }) {
   )
 }
 
-/* Hot spot 1: auto-opens 3 seconds after the Today screen loads, once per session. */
-export function FeedbackAutoPrompt({ toast }: { toast: (m: string) => void }) {
+/* Auto-opens 3 seconds after a screen loads, once per session per slot.
+   Used on Today (slot="today") and the You tab (slot="you"). Once feedback is
+   submitted anywhere it never auto-opens again. */
+export function FeedbackAutoPrompt({ toast, slot = 'today' }: { toast: (m: string) => void; slot?: string }) {
   const [open, setOpen] = useState(false)
   const [done, setDone] = useState(false)
 
   useEffect(() => {
     try {
       if (localStorage.getItem('vinna_feedback_done')) return
-      if (sessionStorage.getItem('vinna_feedback_shown')) return
+      if (sessionStorage.getItem(`vinna_feedback_shown_${slot}`)) return
     } catch { /* ignore */ }
     const t = setTimeout(() => {
       setOpen(true)
-      try { sessionStorage.setItem('vinna_feedback_shown', '1') } catch { /* ignore */ }
+      try { sessionStorage.setItem(`vinna_feedback_shown_${slot}`, '1') } catch { /* ignore */ }
     }, 3000)
     return () => clearTimeout(t)
-  }, [])
+  }, [slot])
 
   function close() { setOpen(false) }
 
   return (
-    <Sheet open={open} onClose={close}>
+    <Sheet open={open} onClose={close} highlight>
       <Eyebrow>● Help shape Vinna</Eyebrow>
       <h2 className="v-h2" style={{ margin: '10px 0 6px' }}>Build Vinna with us</h2>
       <p className="v-meta" style={{ marginBottom: 18 }}>
@@ -127,7 +129,7 @@ export function FeedbackAutoPrompt({ toast }: { toast: (m: string) => void }) {
       ) : (
         <>
           <FeedbackSurvey
-            context="auto"
+            context={slot}
             onSent={() => { setDone(true); try { localStorage.setItem('vinna_feedback_done', '1') } catch { /* ignore */ } toast('Feedback sent. Thank you.') }}
           />
           <button
@@ -148,7 +150,7 @@ export function FeedbackSheet({ open, onClose, toast }: { open: boolean; onClose
   const [done, setDone] = useState(false)
   useEffect(() => { if (open) setDone(false) }, [open])
   return (
-    <Sheet open={open} onClose={onClose}>
+    <Sheet open={open} onClose={onClose} highlight>
       <Eyebrow>Share feedback</Eyebrow>
       <h2 className="v-h2" style={{ margin: '10px 0 6px' }}>Tell us what you think</h2>
       <p className="v-meta" style={{ marginBottom: 18 }}>

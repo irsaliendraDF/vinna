@@ -50,7 +50,7 @@ export function Alert({ children, tone = 'rust', glyph = '⚠' }: { children: Re
   )
 }
 
-export function Sheet({ open, onClose, children }: { open: boolean; onClose: () => void; children: ReactNode }) {
+export function Sheet({ open, onClose, children, highlight = false }: { open: boolean; onClose: () => void; children: ReactNode; highlight?: boolean }) {
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -73,7 +73,12 @@ export function Sheet({ open, onClose, children }: { open: boolean; onClose: () 
         style={{
           width: '100%', maxHeight: '88%', overflowY: 'auto',
           background: 'var(--bg-alt)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
-          borderTop: '1px solid var(--border-soft)', padding: '8px 20px 32px',
+          border: highlight ? '1px solid rgba(255,255,255,0.55)' : undefined,
+          borderTop: highlight ? '1px solid rgba(255,255,255,0.65)' : '1px solid var(--border-soft)',
+          boxShadow: highlight
+            ? '0 0 0 1.5px rgba(255,255,255,0.45), 0 -12px 60px rgba(255,255,255,0.12)'
+            : undefined,
+          padding: '8px 20px 32px',
         }}
       >
         <div style={{ width: 36, height: 4, borderRadius: 4, background: 'var(--border-bark)', margin: '8px auto 18px' }} />
