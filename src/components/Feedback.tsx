@@ -2,81 +2,144 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../lib/store'
 import { Eyebrow, Btn, Sheet } from './ui'
 
-const MOODS = [
-  { key: 'love', label: 'Love it' },
-  { key: 'okay', label: "It's okay" },
-  { key: 'rough', label: 'Needs work' },
+/* Build-useful signal:
+   fit       -> does Vinna solve a real need (product-market fit signal)
+   mustHave  -> which capabilities would make it a daily habit (roadmap priority)
+   message   -> the single most important thing in the tester's own words
+*/
+const FIT = [
+  { key: 'strong', label: 'A strong fit' },
+  { key: 'maybe', label: 'Could be, with work' },
+  { key: 'not_yet', label: 'Not yet' },
 ]
 
-/* Shared sentiment + note form used by both feedback surfaces. */
-function FeedbackForm({ context, onSent, compact = false }: { context: string; onSent: () => void; compact?: boolean }) {
+const MUST_HAVE = [
+  'Cycle & symptom tracking',
+  'Activity sync (Strava, Oura)',
+  'Food & nutrition guidance',
+  'Menopause & perimenopause support',
+  'Sharing with partner or care team',
+  'Trustworthy health answers',
+  'Reminders & screenings',
+  'Something else',
+]
+
+function FeedbackSurvey({ context, onSent }: { context: string; onSent: () => void }) {
   const { submitFeedback } = useApp()
-  const [mood, setMood] = useState<string | null>(null)
-  const [note, setNote] = useState('')
+  const [fit, setFit] = useState<string | null>(null)
+  const [mustHave, setMustHave] = useState<string[]>([])
+  const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
 
+  function toggle(item: string) {
+    setMustHave(prev => (prev.includes(item) ? prev.filter(x => x !== item) : [...prev, item]))
+  }
+
   async function send() {
-    if (!mood) return
+    if (!fit) return
     setBusy(true)
-    await submitFeedback(mood, note.trim(), context)
+    await submitFeedback({ fit, mustHave, message: message.trim(), context })
     setBusy(false)
     onSent()
   }
 
   return (
-    <>
-      <div className="row wrap" style={{ gap: 8 }}>
-        {MOODS.map(m => (
-          <button key={m.key} className={`chip ${mood === m.key ? 'on' : ''}`} onClick={() => setMood(m.key)}>{m.label}</button>
-        ))}
-      </div>
-      {mood && (
-        <div className="stack-sm" style={{ marginTop: 14 }}>
-          <textarea
-            className="field"
-            rows={compact ? 2 : 3}
-            placeholder="Anything you would change or want more of. Optional."
-            value={note}
-            onChange={e => setNote(e.target.value)}
-            style={{ resize: 'none' }}
-          />
-          <Btn sm onClick={send} disabled={busy}>{busy ? 'Sending…' : 'Send feedback →'}</Btn>
+    <div className="stack" style={{ marginTop: 4 }}>
+      <div>
+        <p className="v-label" style={{ marginBottom: 10 }}>How well does Vinna fit a real need in your life?</p>
+        <div className="row wrap" style={{ gap: 8 }}>
+          {FIT.map(f => (
+            <button key={f.key} className={`chip ${fit === f.key ? 'on' : ''}`} onClick={() => setFit(f.key)}>{f.label}</button>
+          ))}
         </div>
+      </div>
+
+      {fit && (
+        <>
+          <div className="reveal">
+            <p className="v-label" style={{ marginBottom: 10 }}>What would make Vinna a daily must-have for you? Pick any.</p>
+            <div className="row wrap" style={{ gap: 8 }}>
+              {MUST_HAVE.map(m => (
+                <button key={m} className={`chip ${mustHave.includes(m) ? 'on' : ''}`} onClick={() => toggle(m)}>{m}</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="reveal">
+            <p className="v-label" style={{ marginBottom: 10 }}>In your words, what is the one thing Vinna must get right for you?</p>
+            <textarea
+              className="field"
+              rows={3}
+              placeholder="The thing that would make or break it for you."
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              style={{ resize: 'none' }}
+            />
+          </div>
+
+          <Btn onClick={send} disabled={busy || !fit}>{busy ? 'Sending…' : 'Send feedback →'}</Btn>
+        </>
       )}
-    </>
+    </div>
   )
 }
 
-/* Hot spot 1: in-flow card on the Today screen. */
-export function FeedbackInline({ toast }: { toast: (m: string) => void }) {
-  const [done, setDone] = useState(false)
-  const [hidden, setHidden] = useState(false)
-  if (hidden) return null
+function ThankYou({ onClose }: { onClose?: () => void }) {
   return (
-    <div className="card accent reveal" style={{ marginTop: 16 }}>
+    <div className="card accent lichen">
+      <Eyebrow tone="lichen">● Sent</Eyebrow>
+      <p className="v-body-sm" style={{ marginTop: 10 }}>
+        Thank you. This is exactly what shapes what we build next, and we read every word.
+      </p>
+      {onClose && <div style={{ marginTop: 16 }}><Btn variant="secondary" onClick={onClose}>Close</Btn></div>}
+    </div>
+  )
+}
+
+/* Hot spot 1: auto-opens 3 seconds after the Today screen loads, once per session. */
+export function FeedbackAutoPrompt({ toast }: { toast: (m: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('vinna_feedback_done')) return
+      if (sessionStorage.getItem('vinna_feedback_shown')) return
+    } catch { /* ignore */ }
+    const t = setTimeout(() => {
+      setOpen(true)
+      try { sessionStorage.setItem('vinna_feedback_shown', '1') } catch { /* ignore */ }
+    }, 3000)
+    return () => clearTimeout(t)
+  }, [])
+
+  function close() { setOpen(false) }
+
+  return (
+    <Sheet open={open} onClose={close}>
+      <Eyebrow>● Help shape Vinna</Eyebrow>
+      <h2 className="v-h2" style={{ margin: '10px 0 6px' }}>Build Vinna with us</h2>
+      <p className="v-meta" style={{ marginBottom: 18 }}>
+        You are one of our first testers. A few quick taps tell us how to make Vinna genuinely useful for you.
+      </p>
       {done ? (
-        <>
-          <Eyebrow tone="lichen">● Thank you</Eyebrow>
-          <p className="v-body-sm" style={{ marginTop: 10 }}>Noted. Your take goes straight to the people building Vinna.</p>
-        </>
+        <ThankYou onClose={close} />
       ) : (
         <>
-          <Eyebrow>● Help shape Vinna</Eyebrow>
-          <h3 className="v-card-title" style={{ margin: '12px 0 4px', fontSize: 16 }}>How is Vinna feeling so far?</h3>
-          <p className="v-body-sm" style={{ marginBottom: 14 }}>
-            You are one of our first testers. A quick word helps us build the right thing.
-          </p>
-          <FeedbackForm context="today" onSent={() => { setDone(true); toast('Feedback sent. Thank you.') }} compact />
+          <FeedbackSurvey
+            context="auto"
+            onSent={() => { setDone(true); try { localStorage.setItem('vinna_feedback_done', '1') } catch { /* ignore */ } toast('Feedback sent. Thank you.') }}
+          />
           <button
-            className="btn-ghost"
-            style={{ display: 'block', marginTop: 12, fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, color: 'var(--fg-3)' }}
-            onClick={() => setHidden(true)}
+            className="btn-ghost center"
+            style={{ display: 'block', width: '100%', marginTop: 16, fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, color: 'var(--fg-3)', padding: '8px 0' }}
+            onClick={close}
           >
             Maybe later
           </button>
         </>
       )}
-    </div>
+    </Sheet>
   )
 }
 
@@ -88,17 +151,16 @@ export function FeedbackSheet({ open, onClose, toast }: { open: boolean; onClose
     <Sheet open={open} onClose={onClose}>
       <Eyebrow>Share feedback</Eyebrow>
       <h2 className="v-h2" style={{ margin: '10px 0 6px' }}>Tell us what you think</h2>
-      <p className="v-meta" style={{ marginBottom: 20 }}>
-        Anything from a small annoyance to a big idea. It reaches the team directly.
+      <p className="v-meta" style={{ marginBottom: 18 }}>
+        Anything from a small annoyance to a big idea. It reaches the team directly and shapes what we build.
       </p>
       {done ? (
-        <div className="card accent lichen">
-          <Eyebrow tone="lichen">● Sent</Eyebrow>
-          <p className="v-body-sm" style={{ marginTop: 10 }}>Thank you for helping shape Vinna. Close this when you are ready.</p>
-          <div style={{ marginTop: 16 }}><Btn variant="secondary" onClick={onClose}>Close</Btn></div>
-        </div>
+        <ThankYou onClose={onClose} />
       ) : (
-        <FeedbackForm context="you" onSent={() => { setDone(true); toast('Feedback sent. Thank you.') }} />
+        <FeedbackSurvey
+          context="you"
+          onSent={() => { setDone(true); try { localStorage.setItem('vinna_feedback_done', '1') } catch { /* ignore */ } toast('Feedback sent. Thank you.') }}
+        />
       )}
     </Sheet>
   )

@@ -25,7 +25,7 @@ interface AppState {
   isSaved: (itemId: string) => boolean
   setTier: (tier: Tier) => void
   // feedback
-  submitFeedback: (sentiment: string, message: string, context: string) => Promise<void>
+  submitFeedback: (payload: { fit: string; mustHave: string[]; message: string; context: string }) => Promise<void>
   // account
   consent: boolean
   setConsent: (v: boolean) => void
@@ -208,14 +208,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     isSaved(itemId) { return saves.some(s => s.itemId === itemId) },
     setTier(tier) { setProfile(p => ({ ...p, tier })) },
 
-    async submitFeedback(sentiment, message, context) {
+    async submitFeedback({ fit, mustHave, message, context }) {
       // Keep a local copy so nothing is lost in demo/guest mode, then mirror to Supabase.
       try {
         const prev = JSON.parse(localStorage.getItem('vinna_feedback') || '[]')
-        prev.unshift({ sentiment, message: message || null, context, at: new Date().toISOString() })
+        prev.unshift({ fit, mustHave, message: message || null, context, at: new Date().toISOString() })
         localStorage.setItem('vinna_feedback', JSON.stringify(prev))
       } catch { /* ignore */ }
-      await syncRow('feedback', { sentiment, message: message || null, context })
+      await syncRow('feedback', { fit, must_have: mustHave, message: message || null, context })
     },
 
     consent,

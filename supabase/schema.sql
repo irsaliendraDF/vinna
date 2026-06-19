@@ -53,11 +53,17 @@ create table if not exists public.saves (
 create table if not exists public.feedback (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references auth.users(id) on delete cascade,
-  sentiment   text,             -- 'love' | 'okay' | 'rough'
-  message     text,
-  context     text,             -- which surface: 'today' | 'you'
+  fit         text,             -- need fit: 'strong' | 'maybe' | 'not_yet'
+  must_have   text[] default '{}', -- capabilities that would make Vinna a daily habit
+  message     text,             -- the one thing Vinna must get right, in their words
+  context     text,             -- which surface: 'auto' | 'you'
   created_at  timestamptz default now()
 );
+-- Safe upgrades if an earlier version of this table already exists
+alter table public.feedback add column if not exists fit       text;
+alter table public.feedback add column if not exists must_have text[] default '{}';
+alter table public.feedback add column if not exists message   text;
+alter table public.feedback add column if not exists context   text;
 
 -- ----------------------------------------------------------------------------
 -- Row Level Security: each user can only see and write their own rows.
