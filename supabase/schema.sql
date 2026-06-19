@@ -49,6 +49,16 @@ create table if not exists public.saves (
   created_at  timestamptz default now()
 );
 
+-- Product feedback from testers (read all rows in the dashboard, not in-app)
+create table if not exists public.feedback (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  sentiment   text,             -- 'love' | 'okay' | 'rough'
+  message     text,
+  context     text,             -- which surface: 'today' | 'you'
+  created_at  timestamptz default now()
+);
+
 -- ----------------------------------------------------------------------------
 -- Row Level Security: each user can only see and write their own rows.
 -- ----------------------------------------------------------------------------
@@ -56,6 +66,7 @@ alter table public.profiles   enable row level security;
 alter table public.feel_checks enable row level security;
 alter table public.logs       enable row level security;
 alter table public.saves      enable row level security;
+alter table public.feedback   enable row level security;
 
 -- profiles
 drop policy if exists "own profile read"   on public.profiles;
@@ -84,3 +95,7 @@ drop policy if exists "own saves delete" on public.saves;
 create policy "own saves read"   on public.saves for select to authenticated using (auth.uid() = user_id);
 create policy "own saves write"  on public.saves for insert to authenticated with check (auth.uid() = user_id);
 create policy "own saves delete" on public.saves for delete to authenticated using (auth.uid() = user_id);
+
+-- feedback (testers write their own; you read everything from the dashboard)
+drop policy if exists "own feedback write" on public.feedback;
+create policy "own feedback write" on public.feedback for insert to authenticated with check (auth.uid() = user_id);

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApp } from '../lib/store'
 import { TopBar } from '../components/TopBar'
 import { Eyebrow, Badge, Btn, Sheet } from '../components/ui'
+import { FeedbackSheet } from '../components/Feedback'
 import { PatternCard } from './Track'
 import { herbs, recipes, patterns, moodMeta } from '../lib/data'
 
@@ -20,6 +21,7 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
   const [hist, setHist] = useState<'all' | 'recipe' | 'herb' | 'symptom'>('all')
   const [pat, setPat] = useState<'all' | 'energy' | 'nutrition' | 'cycle' | 'sleep'>('all')
   const [settings, setSettings] = useState(false)
+  const [feedback, setFeedback] = useState(false)
 
   // merged history feed
   const feed = [
@@ -59,6 +61,17 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
               <span style={{ color: 'var(--fg-3)' }}>→</span>
             </div>
             <p className="v-body-sm" style={{ marginTop: 8 }}>Login & security, privacy, sharing, connected apps, communications, and your data.</p>
+          </button>
+
+          <button className="card accent reveal d1" style={{ marginTop: 12, width: '100%', textAlign: 'left', cursor: 'pointer' }} onClick={() => setFeedback(true)}>
+            <div className="row between">
+              <div>
+                <p className="v-label" style={{ marginBottom: 6 }}>Help shape Vinna</p>
+                <p className="v-card-title" style={{ fontSize: 16 }}>Share feedback</p>
+              </div>
+              <span style={{ color: 'var(--fg-accent)' }}>→</span>
+            </div>
+            <p className="v-body-sm" style={{ marginTop: 8 }}>You are an early tester. Tell us what is working and what you would change.</p>
           </button>
 
           <div className="row wrap" style={{ gap: 8, marginTop: 20 }}>
@@ -138,6 +151,8 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
       <Sheet open={settings} onClose={() => setSettings(false)}>
         <AccountSettings onClose={() => setSettings(false)} toast={toast} />
       </Sheet>
+
+      <FeedbackSheet open={feedback} onClose={() => setFeedback(false)} toast={toast} />
     </>
   )
 }

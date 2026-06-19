@@ -3,6 +3,7 @@ import { useApp } from '../lib/store'
 import { TopBar } from '../components/TopBar'
 import { FeelCheck } from '../components/FeelCheck'
 import { Eyebrow, Btn, Badge, Sheet } from '../components/ui'
+import { FeedbackInline } from '../components/Feedback'
 import { symptomSets } from '../lib/data'
 import type { Mood } from '../lib/types'
 
@@ -92,6 +93,9 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
               </div>
             </div>
           )}
+
+          {/* first-tester feedback prompt */}
+          <FeedbackInline toast={toast} />
 
           <p className="v-quote center" style={{ margin: '40px 8px 8px', color: 'var(--fg-3)' }}>
             The app that grows with you.
