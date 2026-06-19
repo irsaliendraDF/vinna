@@ -76,14 +76,14 @@ function Auth({ onBack }: { onBack: () => void }) {
   return (
     <div className="auth-screen pad-top-safe">
       <button className="icon-btn" style={{ alignSelf: 'flex-start' }} onClick={onBack}>←</button>
-      <div className="reveal" style={{ marginTop: 12 }}>
+      <div className="reveal" style={{ marginTop: 8 }}>
         <Eyebrow>{isSignup ? 'Create account' : 'Welcome back'}</Eyebrow>
-        <h1 className="v-h1" style={{ marginTop: 14 }}>
-          {isSignup ? <>Start with<br /><span>Vinna.</span></> : <>Good to<br /><span>see you.</span></>}
+        <h1 className="v-h2" style={{ marginTop: 10 }}>
+          {isSignup ? 'Start with Vinna.' : 'Good to see you.'}
         </h1>
       </div>
 
-      <div className="stack" style={{ marginTop: 28 }}>
+      <div className="stack-sm" style={{ marginTop: 16 }}>
         {isSignup && (
           <div>
             <label className="field-label">What should Vinna call you?</label>
@@ -105,8 +105,8 @@ function Auth({ onBack }: { onBack: () => void }) {
             <span>
               <p className="v-card-title" style={{ fontSize: 14 }}>Help bring Vinna to life</p>
               <p className="v-body-sm" style={{ marginTop: 4 }}>
-                Yes, keep me close to Vinna. I'd like its occasional product notes and early access, and I'm glad for my
-                sign-up to help shape what gets built. You can change this any time in your account.
+                Yes, send me Vinna's occasional product notes and early access, and use my sign-up to help shape what gets
+                built. Change this any time in your account.
               </p>
             </span>
           </button>
