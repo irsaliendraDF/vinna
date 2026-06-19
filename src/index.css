@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Vinna Design System — Colors & Type
+   Vinna Design System, Colors & Type
    Single source of truth for all branded surfaces.
    Tokens lifted verbatim from colors_and_type.css.
    ========================================================================== */
@@ -87,7 +87,7 @@
 
   /* ---------- MOTION ---------- */
   --ease-reveal: cubic-bezier(.22, .8, .36, 1);
-  --dur-reveal: .55s;
+  --dur-reveal: .32s;
   --dur-hover: .15s;
 
   /* ---------- LAYOUT ---------- */
@@ -206,7 +206,7 @@ input, select, textarea { font-family: inherit; }
 .v-wordmark .a { color: var(--fg-accent); }
 
 /* ==========================================================================
-   APP SHELL — phone frame on desktop, full-bleed on mobile
+   APP SHELL, phone frame on desktop, full-bleed on mobile
    ========================================================================== */
 
 .stage {
@@ -294,7 +294,7 @@ input, select, textarea { font-family: inherit; }
    COMPONENTS
    ========================================================================== */
 
-/* Accent card — signature 4px left bar motif */
+/* Accent card, signature 4px left bar motif */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-hair);
@@ -369,7 +369,7 @@ input, select, textarea { font-family: inherit; }
 .raw .chip { color: var(--raw-ink-2); border-color: var(--raw-border); }
 .raw .chip.on { background: var(--tint-rust); border-color: var(--tint-rust-border); color: var(--vinna-rust); }
 
-/* Badge — monospace pill marker */
+/* Badge, monospace pill marker */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -405,7 +405,7 @@ input, select, textarea { font-family: inherit; }
 .hr { height: 1px; background: var(--border-hair); border: none; margin: var(--space-4) 0; }
 .raw .hr { background: var(--raw-border); }
 
-/* List row — rust tint + 2px left bar on hover */
+/* List row, rust tint + 2px left bar on hover */
 .list-row {
   display: flex;
   align-items: center;
@@ -431,7 +431,7 @@ input, select, textarea { font-family: inherit; }
 .pattern-stat.ochre { color: var(--vinna-ochre); }
 .pattern-stat.muted { color: var(--fg-3); }
 
-/* Section header — eyebrow + 2-line Bebas headline */
+/* Section header, eyebrow + 2-line Bebas headline */
 .section-head { margin: var(--space-8) 0 var(--space-4); }
 .section-head .v-eyebrow { margin-bottom: 10px; }
 
@@ -528,13 +528,26 @@ input, select, textarea { font-family: inherit; }
 /* blurred paywall teaser */
 .teaser-blur { filter: blur(7px); opacity: 0.7; pointer-events: none; user-select: none; }
 
-/* fade-up reveal */
-@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/* fade-up reveal, kept subtle so navigation doesn't feel like everything jumps */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 .reveal { animation: fadeUp var(--dur-reveal) var(--ease-reveal) both; }
-.reveal.d1 { animation-delay: .05s; }
-.reveal.d2 { animation-delay: .10s; }
-.reveal.d3 { animation-delay: .15s; }
-.reveal.d4 { animation-delay: .20s; }
+.reveal.d1 { animation-delay: .03s; }
+.reveal.d2 { animation-delay: .06s; }
+.reveal.d3 { animation-delay: .09s; }
+.reveal.d4 { animation-delay: .12s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; }
+}
+
+/* Checkbox (consent, settings) */
+.checkbox {
+  width: 22px; height: 22px; border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  display: grid; place-items: center;
+  color: var(--vinna-raw); font-size: 12px; flex-shrink: 0;
+  transition: all var(--dur-hover);
+}
+.checkbox.on { background: var(--vinna-rust); border-color: var(--vinna-rust); }
 
 /* raw (light) text helpers */
 .raw .v-card-title, .raw .v-h2, .raw .v-h3, .raw .v-h1 { color: var(--raw-ink); }

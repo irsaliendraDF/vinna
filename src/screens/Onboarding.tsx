@@ -23,7 +23,7 @@ export function Onboarding() {
             <em>women's health.</em>
           </h1>
           <p className="v-quote" style={{ marginTop: 20, color: 'var(--fg-2)', maxWidth: 320 }}>
-            An intelligent health concierge that grows with you — every cycle, every stage.
+            An intelligent health concierge that grows with you, every cycle, every stage.
           </p>
         </div>
       </div>
@@ -43,60 +43,88 @@ export function Onboarding() {
 function Auth({ onBack }: { onBack: () => void }) {
   const { signUp, signIn, signInMagic, continueAsGuest } = useApp()
   const [mode, setMode] = useState<'signup' | 'login'>('signup')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [consent, setConsent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
 
+  const isSignup = mode === 'signup'
+  const ready = isSignup
+    ? Boolean(name.trim() && email && password && consent)
+    : Boolean(email && password)
+
   async function submit() {
+    if (isSignup && !consent) { setMsg('Please confirm the note below to create your account.'); return }
     setBusy(true); setMsg(null)
-    const err = mode === 'signup' ? await signUp(email, password) : await signIn(email, password)
+    const err = isSignup ? await signUp(email, password, name) : await signIn(email, password)
     setBusy(false)
     if (err) setMsg(err)
-    else if (isSupabaseConfigured && mode === 'signup') setMsg('Check your email to confirm, then sign in. Or take the tour for now.')
+    else if (isSupabaseConfigured && isSignup) setMsg('Check your email to confirm, then sign in. Or take the tour for now.')
   }
 
   async function magic() {
     if (!email) { setMsg('Enter your email first.'); return }
+    if (isSignup && (!name.trim() || !consent)) { setMsg('Add your name and confirm the note below first.'); return }
     setBusy(true); setMsg(null)
-    const err = await signInMagic(email)
+    const err = await signInMagic(email, name)
     setBusy(false)
-    setMsg(err ?? 'Magic link sent — check your email.')
+    setMsg(err ?? 'Magic link sent. Check your email.')
   }
 
   return (
     <div className="auth-screen pad-top-safe">
       <button className="icon-btn" style={{ alignSelf: 'flex-start' }} onClick={onBack}>←</button>
       <div className="reveal" style={{ marginTop: 12 }}>
-        <Eyebrow>{mode === 'signup' ? 'Create account' : 'Welcome back'}</Eyebrow>
+        <Eyebrow>{isSignup ? 'Create account' : 'Welcome back'}</Eyebrow>
         <h1 className="v-h1" style={{ marginTop: 14 }}>
-          {mode === 'signup' ? <>Start with<br /><span>Vinna.</span></> : <>Good to<br /><span>see you.</span></>}
+          {isSignup ? <>Start with<br /><span>Vinna.</span></> : <>Good to<br /><span>see you.</span></>}
         </h1>
       </div>
 
       <div className="stack" style={{ marginTop: 28 }}>
+        {isSignup && (
+          <div>
+            <label className="field-label">What should Vinna call you?</label>
+            <input className="field" type="text" autoComplete="given-name" placeholder="First name or nickname" value={name} onChange={e => setName(e.target.value)} />
+          </div>
+        )}
         <div>
           <label className="field-label">Email</label>
           <input className="field" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} />
         </div>
         <div>
           <label className="field-label">Password</label>
-          <input className="field" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
+          <input className="field" type="password" autoComplete={isSignup ? 'new-password' : 'current-password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
         </div>
+
+        {isSignup && (
+          <button type="button" className="toggle-row" onClick={() => setConsent(c => !c)} style={{ alignItems: 'flex-start', gap: 12, textAlign: 'left' }}>
+            <span className={`checkbox ${consent ? 'on' : ''}`}>{consent ? '✓' : ''}</span>
+            <span>
+              <p className="v-card-title" style={{ fontSize: 14 }}>Help bring Vinna to life</p>
+              <p className="v-body-sm" style={{ marginTop: 4 }}>
+                Yes, keep me close to Vinna. I'd like its occasional product notes and early access, and I'm glad for my
+                sign-up to help shape what gets built. You can change this any time in your account.
+              </p>
+            </span>
+          </button>
+        )}
 
         {msg && <p className="v-body-sm" style={{ color: 'var(--fg-warn)' }}>{msg}</p>}
 
-        <Btn onClick={submit} disabled={busy || !email || !password}>
-          {busy ? 'One moment…' : mode === 'signup' ? 'Create account →' : 'Sign in →'}
+        <Btn onClick={submit} disabled={busy || !ready}>
+          {busy ? 'One moment…' : isSignup ? 'Create account →' : 'Sign in →'}
         </Btn>
-        <Btn variant="secondary" onClick={magic} disabled={busy || !email}>Email me a magic link</Btn>
+        <Btn variant="secondary" onClick={magic} disabled={busy || !email || (isSignup && !ready)}>Email me a magic link</Btn>
 
-        <button className="btn-ghost center" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, color: 'var(--fg-3)', padding: '8px 0' }} onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setMsg(null) }}>
-          {mode === 'signup' ? 'I already have an account' : 'Create an account instead'}
+        <button className="btn-ghost center" style={{ fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, color: 'var(--fg-3)', padding: '8px 0' }} onClick={() => { setMode(isSignup ? 'login' : 'signup'); setMsg(null) }}>
+          {isSignup ? 'I already have an account' : 'Create an account instead'}
         </button>
 
         <div className="hr" />
-        <Btn variant="ghost" onClick={continueAsGuest}>Skip — take the demo tour →</Btn>
+        <Btn variant="ghost" onClick={continueAsGuest}>Skip to the demo tour →</Btn>
       </div>
     </div>
   )
@@ -107,7 +135,7 @@ const steps = [
   {
     eyebrow: '01 / Basics',
     title: <>The app that<br /><span>grows with you.</span></>,
-    body: 'Vinna meets you where you are — first cycle through perimenopause and beyond. Tell it a little, and every screen tunes itself to you.',
+    body: 'Vinna meets you where you are, first cycle through perimenopause and beyond. Tell it a little, and every screen tunes itself to you.',
     detail: ['Your name and stage of life', 'Nothing clinical, nothing scary', 'You can change all of it later'],
   },
   {
@@ -119,13 +147,13 @@ const steps = [
   {
     eyebrow: '03 / Connect apps',
     title: <>Reads your<br /><span>whole picture.</span></>,
-    body: 'Connect Strava, Garmin, Peloton, Apple Health or Oura — read-only. When you plan a long ride, Vinna already knows.',
-    detail: ['Strava · rides & runs', 'Oura · sleep & readiness', 'All read-only — you stay in control'],
+    body: 'Connect Strava, Garmin, Peloton, Apple Health or Oura, read-only. When you plan a long ride, Vinna already knows.',
+    detail: ['Strava · rides & runs', 'Oura · sleep & readiness', 'All read-only, you stay in control'],
   },
   {
     eyebrow: '04 / Sharing',
     title: <>You choose<br /><span>what they see.</span></>,
-    body: 'Optionally invite a partner or care team, and pick exactly what they see — cycle phase, mood, symptoms — each an independent toggle.',
+    body: 'Optionally invite a partner or care team, and pick exactly what they see, cycle phase, mood, symptoms, each an independent toggle.',
     detail: ['Partner sees only what you allow', 'Care team gets the summary, not the raw feed', 'Revoke any time'],
   },
 ]
@@ -148,7 +176,7 @@ function Tour({ step, onNext, onBack }: { step: number; onNext: () => void; onBa
             <ul style={{ listStyle: 'none', display: 'grid', gap: 12 }}>
               {s.detail.map(d => (
                 <li key={d} className="v-body-sm row" style={{ alignItems: 'flex-start', gap: 10 }}>
-                  <span style={{ color: 'var(--fg-accent)' }}>—</span><span>{d}</span>
+                  <span style={{ color: 'var(--fg-accent)' }}>·</span><span>{d}</span>
                 </li>
               ))}
             </ul>

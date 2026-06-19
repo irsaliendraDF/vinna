@@ -28,7 +28,7 @@ export function Library({ toast }: { toast: (m: string) => void }) {
           <div className="reveal" style={{ paddingTop: 22 }}>
             <Eyebrow>Library</Eyebrow>
             <h1 className="v-h1" style={{ marginTop: 12, color: 'var(--raw-ink)' }}>What your<br /><span>body needs.</span></h1>
-            <p className="v-body" style={{ marginTop: 12, color: 'var(--raw-ink-2)' }}>Reference, not action. Pull up what today asks for — every entry is honest about what the evidence says.</p>
+            <p className="v-body" style={{ marginTop: 12, color: 'var(--raw-ink-2)' }}>Reference, not action. Pull up what today asks for, every entry is honest about what the evidence says.</p>
           </div>
 
           <div className="row wrap" style={{ gap: 8, marginTop: 20 }}>
@@ -128,7 +128,7 @@ function RatingStep({ questions, onDone, onSkip }: { questions: string[]; onDone
   return (
     <div className="card" style={{ background: 'var(--raw-card)' }}>
       <Eyebrow>How did it go?</Eyebrow>
-      <p className="v-body-sm" style={{ margin: '8px 0 16px' }}>Optional. Two quick questions, tied to today's use — never a 1–10 scale.</p>
+      <p className="v-body-sm" style={{ margin: '8px 0 16px' }}>Optional. Two quick questions, tied to today's use, never a 1–10 scale.</p>
       <div className="stack-sm">
         {questions.map(q => (
           <div key={q}>
@@ -211,7 +211,7 @@ function RecipeDetail({ recipe, onBack, toast }: { recipe: Recipe; onBack: () =>
 
           {layer === 0 && (
             <div className="card reveal" style={{ background: 'var(--raw-card)', marginTop: 16 }}>
-              <p className="v-label" style={{ marginBottom: 12 }}>Nutrients — the why</p>
+              <p className="v-label" style={{ marginBottom: 12 }}>Nutrients, the why</p>
               <div className="stack-sm">
                 {recipe.nutrients.map(n => (
                   <div key={n.label} className="row between">
@@ -224,11 +224,11 @@ function RecipeDetail({ recipe, onBack, toast }: { recipe: Recipe; onBack: () =>
           )}
           {layer === 1 && (
             <div className="card reveal" style={{ background: 'var(--raw-card)', marginTop: 16 }}>
-              <p className="v-label" style={{ marginBottom: 12 }}>Ingredients — the what</p>
+              <p className="v-label" style={{ marginBottom: 12 }}>Ingredients, the what</p>
               <ul style={{ listStyle: 'none', display: 'grid', gap: 8 }}>
                 {recipe.ingredients.map(i => (
                   <li key={i} className="v-body-sm row" style={{ alignItems: 'flex-start', gap: 10, color: 'var(--raw-ink-2)' }}>
-                    <span style={{ color: 'var(--fg-accent)' }}>—</span><span>{i}</span>
+                    <span style={{ color: 'var(--fg-accent)' }}>·</span><span>{i}</span>
                   </li>
                 ))}
               </ul>
@@ -236,7 +236,7 @@ function RecipeDetail({ recipe, onBack, toast }: { recipe: Recipe; onBack: () =>
           )}
           {layer === 2 && (
             <div className="card reveal" style={{ background: 'var(--raw-card)', marginTop: 16 }}>
-              <p className="v-label" style={{ marginBottom: 12 }}>Method — the how</p>
+              <p className="v-label" style={{ marginBottom: 12 }}>Method, the how</p>
               <ol style={{ listStyle: 'none', display: 'grid', gap: 12, counterReset: 'step' }}>
                 {recipe.method.map(m => (
                   <li key={m} className="v-body-sm row" style={{ alignItems: 'flex-start', gap: 12, color: 'var(--raw-ink-2)' }}>

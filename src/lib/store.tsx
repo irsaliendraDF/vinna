@@ -13,9 +13,9 @@ interface AppState {
   logs: LogEntry[]
   saves: SavedItem[]
   // auth
-  signUp: (email: string, password: string) => Promise<string | null>
+  signUp: (email: string, password: string, name?: string) => Promise<string | null>
   signIn: (email: string, password: string) => Promise<string | null>
-  signInMagic: (email: string) => Promise<string | null>
+  signInMagic: (email: string, name?: string) => Promise<string | null>
   continueAsGuest: () => void
   signOut: () => Promise<void>
   // data
@@ -24,11 +24,21 @@ interface AppState {
   toggleSave: (itemId: string, itemKind: SavedItem['itemKind']) => void
   isSaved: (itemId: string) => boolean
   setTier: (tier: Tier) => void
+  // account
+  consent: boolean
+  setConsent: (v: boolean) => void
+  updateEmail: (email: string) => Promise<string | null>
+  updatePassword: (password: string) => Promise<string | null>
+  deleteAccount: () => Promise<void>
 }
 
 const Ctx = createContext<AppState | null>(null)
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36)
 const daysAgo = (n: number) => new Date(Date.now() - n * 864e5).toISOString()
+const firstName = (full: string) => {
+  const w = full.trim().split(/\s+/)[0] || ''
+  return w ? w.charAt(0).toUpperCase() + w.slice(1) : ''
+}
 
 function seedData(): { feelChecks: FeelCheck[]; logs: LogEntry[]; saves: SavedItem[] } {
   return {
@@ -67,18 +77,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [feelChecks, setFeelChecks] = useState<FeelCheck[]>([])
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [saves, setSaves] = useState<SavedItem[]>([])
+  const [consent, setConsentState] = useState<boolean>(() => {
+    try { return localStorage.getItem('vinna_consent') !== 'false' } catch { return true }
+  })
 
   // hydrate state for a given user id (local cache is source of truth for rendering)
   function hydrate(u: AppUser) {
+    // Personalise the greeting with the name the account holder gave at sign-up.
+    const savedName = localStorage.getItem('vinna_name')
+    const withName = (p: Profile) => (savedName ? { ...p, name: firstName(savedName) } : p)
     const cached = loadLocal(u.id)
     if (cached) {
-      setProfile(cached.profile ?? demoProfile)
+      setProfile(withName(cached.profile ?? demoProfile))
       setFeelChecks(cached.feelChecks ?? [])
       setLogs(cached.logs ?? [])
       setSaves(cached.saves ?? [])
     } else {
       const seed = seedData()
-      setProfile(demoProfile)
+      setProfile(withName(demoProfile))
       setFeelChecks(seed.feelChecks)
       setLogs(seed.logs)
       setSaves(seed.saves)
@@ -93,6 +109,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const { data } = await supabase.auth.getSession()
         const s = data.session
         if (s && active) {
+          rememberName(s.user.user_metadata?.full_name)
           const u: AppUser = { id: s.user.id, email: s.user.email ?? '', isDemo: false }
           setUser(u); hydrate(u)
         }
@@ -102,6 +119,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         // keeps a returning, signed-in user logged in.
         supabase.auth.onAuthStateChange((_e, sess) => {
           if (!sess) return
+          rememberName(sess.user.user_metadata?.full_name)
           const u: AppUser = { id: sess.user.id, email: sess.user.email ?? '', isDemo: false }
           setUser(u); hydrate(u)
         })
@@ -124,7 +142,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try { await supabase.from(table).insert({ user_id: user.id, ...row }) } catch { /* non-fatal */ }
   }
 
+  function rememberName(name?: unknown) {
+    if (typeof name === 'string' && name.trim()) localStorage.setItem('vinna_name', name.trim())
+  }
+
   function continueGuest() {
+    // The demo tour is Aga's world, so clear any saved name and stay as Aga.
+    localStorage.removeItem('vinna_name')
     const u: AppUser = { id: 'guest', email: 'aga@vinna.demo', isDemo: true }
     localStorage.setItem('vinna_guest', JSON.stringify(u))
     setUser(u); hydrate(u)
@@ -133,9 +157,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const state: AppState = {
     ready, user, profile, feelChecks, logs, saves,
 
-    async signUp(email, password) {
-      if (!isSupabaseConfigured || !supabase) { continueGuest(); return null }
-      const { error } = await supabase.auth.signUp({ email, password })
+    async signUp(email, password, name) {
+      rememberName(name)
+      if (!isSupabaseConfigured || !supabase) {
+        const u: AppUser = { id: 'guest', email: email || 'you@vinna.demo', isDemo: true }
+        localStorage.setItem('vinna_guest', JSON.stringify(u)); setUser(u); hydrate(u); return null
+      }
+      const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name ?? null } } })
       return error ? error.message : null
     },
     async signIn(email, password) {
@@ -143,9 +171,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       return error ? error.message : null
     },
-    async signInMagic(email) {
+    async signInMagic(email, name) {
+      rememberName(name)
       if (!isSupabaseConfigured || !supabase) { continueGuest(); return null }
-      const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } })
+      const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin, data: name ? { full_name: name } : undefined } })
       return error ? error.message : null
     },
     continueAsGuest() { continueGuest() },
@@ -176,9 +205,40 @@ export function AppProvider({ children }: { children: ReactNode }) {
     },
     isSaved(itemId) { return saves.some(s => s.itemId === itemId) },
     setTier(tier) { setProfile(p => ({ ...p, tier })) },
+
+    consent,
+    setConsent(v) {
+      setConsentState(v)
+      try { localStorage.setItem('vinna_consent', v ? 'true' : 'false') } catch { /* ignore */ }
+    },
+    async updateEmail(email) {
+      if (!isSupabaseConfigured || !supabase || user?.isDemo) return null
+      const { error } = await supabase.auth.updateUser({ email })
+      return error ? error.message : null
+    },
+    async updatePassword(password) {
+      if (!isSupabaseConfigured || !supabase || user?.isDemo) return null
+      const { error } = await supabase.auth.updateUser({ password })
+      return error ? error.message : null
+    },
+    async deleteAccount() {
+      // Remove the account holder's data this app controls, then sign out.
+      if (isSupabaseConfigured && supabase && user && !user.isDemo) {
+        try {
+          await supabase.from('saves').delete().eq('user_id', user.id)
+          await supabase.from('logs').delete().eq('user_id', user.id)
+          await supabase.from('feel_checks').delete().eq('user_id', user.id)
+          await supabase.from('profiles').delete().eq('id', user.id)
+        } catch { /* best effort */ }
+      }
+      if (user) { try { localStorage.removeItem(LS(user.id)) } catch { /* ignore */ } }
+      localStorage.removeItem('vinna_name'); localStorage.removeItem('vinna_guest')
+      if (isSupabaseConfigured && supabase) { try { await supabase.auth.signOut() } catch { /* ignore */ } }
+      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([])
+    },
   }
 
-  const value = useMemo(() => state, [ready, user, profile, feelChecks, logs, saves])
+  const value = useMemo(() => state, [ready, user, profile, feelChecks, logs, saves, consent])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 

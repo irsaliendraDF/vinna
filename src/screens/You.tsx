@@ -15,7 +15,7 @@ const relTime = (iso: string) => {
 const titleFor = (id: string) => herbs.find(h => h.id === id)?.name ?? recipes.find(r => r.id === id)?.title ?? id
 
 export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void }) {
-  const { profile, logs, feelChecks, saves, signOut, user } = useApp()
+  const { profile, logs, feelChecks, saves } = useApp()
   const [sub, setSub] = useState<Sub>('history')
   const [hist, setHist] = useState<'all' | 'recipe' | 'herb' | 'symptom'>('all')
   const [pat, setPat] = useState<'all' | 'energy' | 'nutrition' | 'cycle' | 'sleep'>('all')
@@ -24,7 +24,7 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
   // merged history feed
   const feed = [
     ...logs.map(l => ({ kind: l.itemKind as string, when: l.createdAt, title: l.itemTitle, sub: `Logged · Day ${l.cycleDay}`, ratings: l.ratings })),
-    ...feelChecks.map(f => ({ kind: 'symptom', when: f.createdAt, title: `Feel check — ${moodMeta[f.mood].label}`, sub: f.symptoms.join(' · ') || `Day ${f.cycleDay}`, ratings: undefined as undefined | Record<string, string> })),
+    ...feelChecks.map(f => ({ kind: 'symptom', when: f.createdAt, title: `Feel check · ${moodMeta[f.mood].label}`, sub: f.symptoms.join(' · ') || `Day ${f.cycleDay}`, ratings: undefined as undefined | Record<string, string> })),
   ].sort((a, b) => +new Date(b.when) - +new Date(a.when))
   const feedFiltered = hist === 'all' ? feed : feed.filter(f => f.kind === hist)
   const patFiltered = pat === 'all' ? patterns : patterns.filter(p => p.cat === pat)
@@ -49,6 +49,17 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
               <Btn sm variant="secondary" onClick={() => openPaywall()}>{profile.tier === 'free' ? 'Upgrade →' : 'Manage →'}</Btn>
             </div>
           </div>
+
+          <button className="card reveal d1" style={{ marginTop: 12, width: '100%', textAlign: 'left', cursor: 'pointer' }} onClick={() => setSettings(true)}>
+            <div className="row between">
+              <div>
+                <p className="v-label" style={{ marginBottom: 6 }}>Account</p>
+                <p className="v-card-title" style={{ fontSize: 16 }}>Account & settings</p>
+              </div>
+              <span style={{ color: 'var(--fg-3)' }}>→</span>
+            </div>
+            <p className="v-body-sm" style={{ marginTop: 8 }}>Login & security, privacy, sharing, connected apps, communications, and your data.</p>
+          </button>
 
           <div className="row wrap" style={{ gap: 8, marginTop: 20 }}>
             {(['history', 'saved', 'patterns'] as Sub[]).map(s => (
@@ -91,7 +102,7 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
 
           {sub === 'saved' && (
             <div className="reveal" style={{ marginTop: 16 }}>
-              <p className="v-meta" style={{ marginBottom: 14 }}>Your wishlist — things to come back to.</p>
+              <p className="v-meta" style={{ marginBottom: 14 }}>Your wishlist, things to come back to.</p>
               {saves.length === 0 ? <Empty /> : (
                 <div className="grid-2">
                   {saves.map(s => (
@@ -125,30 +136,135 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
       </div>
 
       <Sheet open={settings} onClose={() => setSettings(false)}>
-        <Eyebrow>Settings</Eyebrow>
-        <h2 className="v-h2" style={{ margin: '10px 0 18px' }}>Your account</h2>
-
-        <p className="v-label" style={{ marginBottom: 12 }}>Connected apps</p>
-        <div className="stack-sm">
-          <ToggleRow label="Strava" desc="Read-only · rides & runs" on />
-          <ToggleRow label="Oura" desc="Read-only · sleep & readiness" on />
-          <ToggleRow label="Apple Health" desc="Read-only" />
-          <ToggleRow label="Calendar" desc="Reminders & screening nudges" on />
-        </div>
-
-        <p className="v-label" style={{ margin: '24px 0 12px' }}>Sharing</p>
-        <p className="v-body-sm" style={{ marginBottom: 12 }}>Choose exactly what a partner or care team sees. Each is independent.</p>
-        <div className="stack-sm">
-          <ToggleRow label="Cycle phase" desc="Partner" on />
-          <ToggleRow label="Mood" desc="Partner" on />
-          <ToggleRow label="Symptoms" desc="Care team" />
-          <ToggleRow label="Health intelligence" desc="Care team" on />
-        </div>
-
-        <div className="hr" style={{ margin: '24px 0' }} />
-        <p className="v-meta" style={{ marginBottom: 14 }}>Signed in as {user?.email}{user?.isDemo ? ' (guest)' : ''}</p>
-        <Btn variant="secondary" onClick={async () => { await signOut(); toast('Signed out.') }}>Sign out</Btn>
+        <AccountSettings onClose={() => setSettings(false)} toast={toast} />
       </Sheet>
+    </>
+  )
+}
+
+function AccountSettings({ onClose, toast }: { onClose: () => void; toast: (m: string) => void }) {
+  const { user, profile, consent, setConsent, updateEmail, updatePassword, deleteAccount, signOut } = useApp()
+  const [editEmail, setEditEmail] = useState(false)
+  const [newEmail, setNewEmail] = useState('')
+  const [editPw, setEditPw] = useState(false)
+  const [newPw, setNewPw] = useState('')
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const guest = user?.isDemo
+
+  async function saveEmail() {
+    if (!newEmail) return
+    setBusy(true)
+    const err = await updateEmail(newEmail)
+    setBusy(false)
+    if (err) { toast(err); return }
+    setEditEmail(false); setNewEmail('')
+    toast(guest ? 'Email changes need a real account.' : 'Confirmation sent to your new email.')
+  }
+  async function savePw() {
+    if (newPw.length < 6) { toast('Use at least 6 characters.'); return }
+    setBusy(true)
+    const err = await updatePassword(newPw)
+    setBusy(false)
+    if (err) { toast(err); return }
+    setEditPw(false); setNewPw('')
+    toast(guest ? 'Password changes need a real account.' : 'Password updated.')
+  }
+  function exportData() {
+    try {
+      const blob = new Blob([localStorage.getItem(`vinna_state_${user?.id}`) ?? '{}'], { type: 'application/json' })
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob); a.download = 'vinna-my-data.json'; a.click()
+      toast('Your data is downloading.')
+    } catch { toast('Could not export right now.') }
+  }
+
+  return (
+    <>
+      <Eyebrow>Account & settings</Eyebrow>
+      <h2 className="v-h2" style={{ margin: '10px 0 6px' }}>Your account</h2>
+      <p className="v-meta" style={{ marginBottom: 20 }}>Signed in as {user?.email}{guest ? ' (guest)' : ''}</p>
+
+      {/* Login & security */}
+      <p className="v-label" style={{ marginBottom: 12 }}>Login & security</p>
+      <div className="stack-sm">
+        <div className="card flat" style={{ padding: 16 }}>
+          <div className="row between">
+            <div><p className="v-card-title" style={{ fontSize: 14 }}>Email</p><p className="v-meta" style={{ marginTop: 2 }}>{user?.email}</p></div>
+            <Btn sm variant="ghost" onClick={() => setEditEmail(v => !v)}>{editEmail ? 'Cancel' : 'Change'}</Btn>
+          </div>
+          {editEmail && (
+            <div className="stack-sm" style={{ marginTop: 12 }}>
+              <input className="field" type="email" placeholder="new@email.com" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
+              <Btn sm onClick={saveEmail} disabled={busy || !newEmail}>Save email →</Btn>
+            </div>
+          )}
+        </div>
+        <div className="card flat" style={{ padding: 16 }}>
+          <div className="row between">
+            <div><p className="v-card-title" style={{ fontSize: 14 }}>Password</p><p className="v-meta" style={{ marginTop: 2 }}>••••••••</p></div>
+            <Btn sm variant="ghost" onClick={() => setEditPw(v => !v)}>{editPw ? 'Cancel' : 'Change'}</Btn>
+          </div>
+          {editPw && (
+            <div className="stack-sm" style={{ marginTop: 12 }}>
+              <input className="field" type="password" placeholder="New password" value={newPw} onChange={e => setNewPw(e.target.value)} />
+              <Btn sm onClick={savePw} disabled={busy || !newPw}>Save password →</Btn>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Communications & consent */}
+      <p className="v-label" style={{ margin: '24px 0 12px' }}>Communications</p>
+      <button className="toggle-row" onClick={() => setConsent(!consent)} style={{ width: '100%' }}>
+        <div style={{ textAlign: 'left', paddingRight: 12 }}>
+          <p className="v-card-title" style={{ fontSize: 14 }}>Product notes & early access</p>
+          <p className="v-body-sm" style={{ marginTop: 4 }}>Occasional updates that help shape what Vinna builds. Turn off any time.</p>
+        </div>
+        <span className={`switch ${consent ? 'on' : ''}`} />
+      </button>
+
+      {/* Privacy & sharing */}
+      <p className="v-label" style={{ margin: '24px 0 12px' }}>Privacy & sharing</p>
+      <p className="v-body-sm" style={{ marginBottom: 12 }}>Choose exactly what a partner or care team sees. Each is independent.</p>
+      <div className="stack-sm">
+        <ToggleRow label="Cycle phase" desc="Partner" on />
+        <ToggleRow label="Mood" desc="Partner" on />
+        <ToggleRow label="Symptoms" desc="Care team" />
+        <ToggleRow label="Health intelligence" desc="Care team" on />
+      </div>
+
+      {/* Connected apps */}
+      <p className="v-label" style={{ margin: '24px 0 12px' }}>Connected apps</p>
+      <div className="stack-sm">
+        <ToggleRow label="Strava" desc="Read-only · rides & runs" on />
+        <ToggleRow label="Oura" desc="Read-only · sleep & readiness" on />
+        <ToggleRow label="Apple Health" desc="Read-only" />
+        <ToggleRow label="Calendar" desc="Reminders & screening nudges" on />
+      </div>
+
+      {/* Your data */}
+      <p className="v-label" style={{ margin: '24px 0 12px' }}>Your data</p>
+      <div className="stack-sm">
+        <Btn variant="secondary" onClick={exportData}>Download my data</Btn>
+        {!confirmDelete ? (
+          <button className="btn btn-ghost" style={{ color: 'var(--fg-warn)' }} onClick={() => setConfirmDelete(true)}>Delete my account</button>
+        ) : (
+          <div className="card accent ochre">
+            <Eyebrow tone="ochre">⚠ This cannot be undone</Eyebrow>
+            <p className="v-body-sm" style={{ margin: '10px 0 14px' }}>
+              This removes your check-ins, logs and saved items, and signs you out. Vinna keeps nothing it does not need.
+            </p>
+            <div className="grid-2">
+              <Btn sm variant="secondary" onClick={() => setConfirmDelete(false)}>Keep my account</Btn>
+              <button className="btn btn-primary sm" onClick={async () => { await deleteAccount(); onClose(); toast('Your account and data were removed.') }}>Delete</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="hr" style={{ margin: '24px 0' }} />
+      <Btn variant="secondary" onClick={async () => { await signOut(); onClose(); toast('Signed out.') }}>Sign out</Btn>
     </>
   )
 }

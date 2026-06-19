@@ -10,14 +10,14 @@ const windows = [
   {
     when: 'Now', tone: 'rust' as const,
     items: [
-      'Warm ginger oats — gentle on a cramp-y morning, steady carbs for later.',
+      'Warm ginger oats, gentle on a cramp-y morning, steady carbs for later.',
       'Top up iron: a citrus glass with breakfast helps absorption on Day 1.',
     ],
   },
   {
     when: 'Midday', tone: 'ochre' as const,
     items: [
-      'Iron-forward lunch — the beef & lentil bowl replenishes heavy-day stores.',
+      'Iron-forward lunch, the beef & lentil bowl replenishes heavy-day stores.',
       'Keep movement easy. A short walk over a hard session today.',
     ],
   },
@@ -25,7 +25,7 @@ const windows = [
     when: 'Evening', tone: 'lichen' as const,
     items: [
       'Magnesium glycinate to wind the legs down before the ride block.',
-      'Tart cherry if you trained — traditionally used to support overnight recovery.',
+      'Tart cherry if you trained, traditionally used to support overnight recovery.',
     ],
   },
 ]
@@ -58,7 +58,7 @@ export function Track({ openPaywall }: { openPaywall: (ctx?: string) => void }) 
             <div className="reveal" style={{ marginTop: 20 }}>
               <div className="card flat">
                 <p className="v-label" style={{ marginBottom: 8 }}>Why this today</p>
-                <p className="v-body-sm">Front-loading rest beats a recovery scramble at 9pm. Each window is a small, doable thing — not a list you'll forget by noon.</p>
+                <p className="v-body-sm">Front-loading rest beats a recovery scramble at 9pm. Each window is a small, doable thing, not a list you'll forget by noon.</p>
               </div>
 
               <div className="stack" style={{ marginTop: 16 }}>
@@ -71,7 +71,7 @@ export function Track({ openPaywall }: { openPaywall: (ctx?: string) => void }) 
                     <ul style={{ listStyle: 'none', display: 'grid', gap: 10, marginTop: 12 }}>
                       {w.items.map(it => (
                         <li key={it} className="v-body-sm row" style={{ alignItems: 'flex-start', gap: 10 }}>
-                          <span style={{ color: `var(--vinna-${w.tone})`, lineHeight: 1.5 }}>—</span>
+                          <span style={{ color: `var(--vinna-${w.tone})`, lineHeight: 1.5 }}>·</span>
                           <span>{it}</span>
                         </li>
                       ))}

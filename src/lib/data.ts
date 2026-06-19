@@ -46,7 +46,7 @@ export const herbs: Herb[] = [
     preparation:
       'A common form is fresh ginger steeped as a tea, taken in the first two days. Some prefer it as a standardised capsule with food.',
     caution:
-      'May interact with blood-thinning medication. This is educational information, not medical advice — talk to your care team about what is right for you.',
+      'May interact with blood-thinning medication. This is educational information, not medical advice, talk to your care team about what is right for you.',
   },
   {
     id: 'magnesium',
@@ -60,7 +60,7 @@ export const herbs: Herb[] = [
       'Magnesium is a mineral the body uses in muscle and nerve function. The glycinate form is often chosen for its gentleness on digestion and is associated with evening wind-down.',
     preparation: 'Commonly taken in the evening, away from high-dose calcium. Start low and notice how you sleep.',
     caution:
-      'High doses can loosen the stomach. Educational information only — check with your care team if you take other medication.',
+      'High doses can loosen the stomach. Educational information only, check with your care team if you take other medication.',
   },
   {
     id: 'raspberry-leaf',
@@ -110,7 +110,7 @@ export const herbs: Herb[] = [
     needs: ['energy', 'phase'],
     evidence: 'Clinically reviewed',
     traditional:
-      'The first days of a cycle are when iron stores are most drawn on. Food-first iron — red meat, lentils, leafy greens with vitamin C — is the gentlest way to replenish.',
+      'The first days of a cycle are when iron stores are most drawn on. Food-first iron, red meat, lentils, leafy greens with vitamin C, is the gentlest way to replenish.',
     preparation: 'Pair plant iron with a squeeze of citrus to help absorption. Keep tea and coffee away from the meal.',
     caution: 'Only supplement iron if a test shows you need it. Educational information, not a diagnosis.',
   },
@@ -121,7 +121,7 @@ export const recipes: Recipe[] = [
     id: 'iron-bowl',
     title: 'Iron-forward beef & lentil bowl',
     glyph: '❧',
-    why: 'Day 1 is when iron stores are most drawn on. This bowl pairs heme and plant iron with citrus to help your body take it up — so the dip you feel on heavy days has somewhere to land.',
+    why: 'Day 1 is when iron stores are most drawn on. This bowl pairs heme and plant iron with citrus to help your body take it up, so the dip you feel on heavy days has somewhere to land.',
     needs: ['energy', 'phase', 'recovery'],
     time: '25 min',
     tags: ['Iron', 'Protein', 'Day 1'],
@@ -142,7 +142,7 @@ export const recipes: Recipe[] = [
       'Sear the beef in a hot pan with a little oil and cumin, 3–4 minutes.',
       'Add lentils and red pepper, warm through.',
       'Fold in spinach until just wilted.',
-      'Off the heat, squeeze over lemon — the vitamin C helps iron absorption.',
+      'Off the heat, squeeze over lemon, the vitamin C helps iron absorption.',
     ],
     evidence: 'Clinically reviewed',
   },
@@ -228,7 +228,7 @@ export const innovations = [
     id: 'cycle-vo2',
     eyebrow: '● NEW RESEARCH',
     title: 'Cycle phase and endurance performance',
-    blurb: 'A 2026 review on how training response shifts across the menstrual cycle — and what is still unknown.',
+    blurb: 'A 2026 review on how training response shifts across the menstrual cycle, and what is still unknown.',
     evidence: 'Evidence reviewed · 6 studies',
   },
   {
@@ -247,7 +247,7 @@ export const innovations = [
   },
 ]
 
-/* Pattern cards — the data decides what surfaces. */
+/* Pattern cards, the data decides what surfaces. */
 export const patterns = [
   {
     id: 'ginger-cramp',
@@ -284,7 +284,7 @@ export const patterns = [
     stat: '1/5',
     statLabel: 'logged',
     color: 'muted' as const,
-    title: 'Recovery meals — needs more data',
+    title: 'Recovery meals, needs more data',
     body: 'You have logged one recovery meal so far. Log a few more and Vinna can tell you what actually helps your legs.',
     footer: 'Needs more data',
     cat: 'nutrition',
@@ -309,7 +309,7 @@ export const tiers = [
     id: 'plus' as const,
     name: 'Vinna+',
     price: '$2.99',
-    line: 'Daily insight tuned to your phase — the what.',
+    line: 'Daily insight tuned to your phase, the what.',
     features: [
       'Daily insights tuned to your phase',
       'Trending prompts that open deeper understanding',
@@ -321,7 +321,7 @@ export const tiers = [
     id: 'deep' as const,
     name: 'Vinna Deep',
     price: '$5.99',
-    line: 'The full why — phase-timed, and it learns your tastes.',
+    line: 'The full why, phase-timed, and it learns your tastes.',
     features: [
       'The full reasoning: why these foods, herbs & nutrients, and exactly when',
       'Phase-timed protocols',

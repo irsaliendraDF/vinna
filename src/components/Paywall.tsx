@@ -15,7 +15,7 @@ export function Paywall({ context, onClose }: { context?: string; onClose: () =>
         Tracking is free.<br /><span style={{ color: 'var(--fg-accent)' }}>Understanding goes deeper.</span>
       </h2>
       <p className="v-body" style={{ marginTop: -4 }}>
-        {context ?? 'Your tracking, sync and reminders are always free. Paid tiers unlock interpretation of your own data — the what, then the why.'}
+        {context ?? 'Your tracking, sync and reminders are always free. Paid tiers unlock interpretation of your own data, the what, then the why.'}
       </p>
 
       <div className="stack-sm" style={{ marginTop: 4 }}>

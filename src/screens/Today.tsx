@@ -8,6 +8,13 @@ import type { Mood } from '../lib/types'
 
 const today = new Date().toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' })
 
+function salutation() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
 export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void }) {
   const { profile, addFeelCheck } = useApp()
   const [rideOpen, setRideOpen] = useState(false)
@@ -23,7 +30,7 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
           <div className="reveal" style={{ paddingTop: 22 }}>
             <Eyebrow noRule>{today}</Eyebrow>
             <h1 className="v-h1" style={{ marginTop: 12 }}>
-              Good morning,<br /><span>{profile.name}.</span>
+              {salutation()},<br /><span>{profile.name}.</span>
             </h1>
           </div>
 
@@ -34,7 +41,7 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
               <Badge tone="rust" dot>{profile.phase}</Badge>
             </div>
             <p className="v-body" style={{ marginTop: 12 }}>
-              You're on day {profile.cycleDay} of your cycle — the menstrual phase. Energy often sits low here and that
+              You're on day {profile.cycleDay} of your cycle, the menstrual phase. Energy often sits low here and that
               is your body doing exactly what it should. Vinna has front-loaded rest and iron-forward food today.
             </p>
           </div>
@@ -47,13 +54,13 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
             />
           </div>
 
-          {/* ride prep — synced */}
+          {/* ride prep, synced */}
           <div className="card reveal d3" style={{ marginTop: 16 }}>
             <div className="row between">
               <Eyebrow tone="ochre">● Synced from Strava</Eyebrow>
               <span className="v-meta">Planned · today</span>
             </div>
-            <h3 className="v-h3" style={{ margin: '12px 0 4px' }}>Ride prep — {profile.goal}</h3>
+            <h3 className="v-h3" style={{ margin: '12px 0 4px' }}>Ride prep, {profile.goal}</h3>
             <p className="v-body-sm">
               80km, 2,400m of climbing, finishing at altitude. On Day 1 your fuelling and pacing want a small adjustment.
             </p>
@@ -71,7 +78,7 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
               </h3>
               <p className="v-body-sm">
                 Across your last few cycles your check-ins show stronger Day 1 fatigue than the months before. It is not
-                a diagnosis — just something a clinician might want to know. Vinna can prepare a short summary you can bring.
+                a diagnosis, just something a clinician might want to know. Vinna can prepare a short summary you can bring.
               </p>
               <div style={{ marginTop: 16 }}>
                 <Btn sm variant="primary" onClick={() => toast('Summary saved to You → Health intelligence.')}>Prepare summary →</Btn>
@@ -106,20 +113,20 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
 
         <div className="stack-sm" style={{ marginTop: 16 }}>
           <Row k="Before" v="A slow-carb breakfast 2–3h out. Hydrate with electrolytes." />
-          <Row k="Free headline" v="Keep the first 20km easy — let your legs find the day before you push the climb." />
+          <Row k="Free headline" v="Keep the first 20km easy, let your legs find the day before you push the climb." />
         </div>
 
         {locked ? (
           <div style={{ position: 'relative', marginTop: 18 }}>
             <div className="card teaser-blur">
               <p className="v-label" style={{ marginBottom: 10 }}>Phase-timed fuelling · Vinna+</p>
-              <p className="v-body-sm">Carbs per hour by climb segment, the exact beetroot timing for your start, and the herbal recovery stack matched to a Day 1 effort — tuned to how you checked in this morning.</p>
+              <p className="v-body-sm">Carbs per hour by climb segment, the exact beetroot timing for your start, and the herbal recovery stack matched to a Day 1 effort, tuned to how you checked in this morning.</p>
             </div>
             <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', padding: 20 }}>
               <div className="center stack-sm">
                 <Badge tone="rust">◆ Vinna+ insight</Badge>
                 <p className="v-body-sm" style={{ maxWidth: 240 }}>Unlock the full fuelling and recovery plan for this ride.</p>
-                <Btn sm onClick={() => { setRideOpen(false); openPaywall('This is a Vinna+ insight — activity-aware fuelling and herbal guidance for your synced ride.') }}>
+                <Btn sm onClick={() => { setRideOpen(false); openPaywall('This is a Vinna+ insight, activity-aware fuelling and herbal guidance for your synced ride.') }}>
                   Unlock guide →
                 </Btn>
               </div>

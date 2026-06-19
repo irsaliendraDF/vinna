@@ -44,7 +44,7 @@ export function FeelCheck({ onDetailed, onDone }: { onDetailed: () => void; onDo
     <div className="card">
       <Eyebrow>Feel check</Eyebrow>
       <h3 className="v-h3" style={{ margin: '10px 0 4px' }}>How are you, really?</h3>
-      <p className="v-body-sm" style={{ marginBottom: 16 }}>One tap. This shapes your day — it never blocks it.</p>
+      <p className="v-body-sm" style={{ marginBottom: 16 }}>One tap. This shapes your day, it never blocks it.</p>
 
       <div className="feel-grid">
         {MOODS.map(m => (
