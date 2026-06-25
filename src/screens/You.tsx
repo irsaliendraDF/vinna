@@ -3,6 +3,7 @@ import { useApp } from '../lib/store'
 import { TopBar } from '../components/TopBar'
 import { Eyebrow, Badge, Btn, Sheet } from '../components/ui'
 import { FeedbackSheet, FeedbackAutoPrompt } from '../components/Feedback'
+import { SharePlanCard } from '../components/Share'
 import { PatternCard } from './Track'
 import { herbs, recipes, patterns, moodMeta, didYouKnow } from '../lib/data'
 
@@ -67,6 +68,8 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
             </div>
             <p className="v-body-sm" style={{ marginTop: 8 }}>Login & security, privacy, sharing, connected apps, communications, and your data.</p>
           </button>
+
+          <SharePlanCard toast={toast} />
 
           <button className="card accent reveal d1" style={{ marginTop: 12, width: '100%', textAlign: 'left', cursor: 'pointer' }} onClick={() => setFeedback(true)}>
             <div className="row between">
@@ -249,12 +252,11 @@ function AccountSettings({ onClose, toast }: { onClose: () => void; toast: (m: s
 
       {/* Privacy & sharing */}
       <p className="v-label" style={{ margin: '24px 0 12px' }}>Privacy & sharing</p>
-      <p className="v-body-sm" style={{ marginBottom: 12 }}>Choose exactly what a partner or care team sees. Each is independent.</p>
-      <div className="stack-sm">
-        <ToggleRow label="Cycle phase" desc="Partner" on />
-        <ToggleRow label="Mood" desc="Partner" on />
-        <ToggleRow label="Symptoms" desc="Care team" />
-        <ToggleRow label="Health intelligence" desc="Care team" on />
+      <div className="card flat" style={{ padding: 16 }}>
+        <p className="v-body-sm">
+          Sharing is per person now. Choose who sees what, and send or stop an invite any time, from{' '}
+          <strong style={{ color: 'var(--fg-1)' }}>Share your plan</strong> on your You page.
+        </p>
       </div>
 
       {/* Connected apps */}

@@ -400,6 +400,40 @@ export const communityClubs = [
   },
 ]
 
+/* Share your plan: who you can share with, and the granular things they can see.
+   Sending an invite is illustrative in the demo; the chosen shares persist. */
+export const shareAudiences = [
+  {
+    key: 'partner' as const,
+    label: 'Partner',
+    glyph: '◐',
+    blurb: 'They get a quiet heads-up in their own calendar, so it is not always on you to say it out loud.',
+    defaults: ['feeling', 'cycle'],
+  },
+  {
+    key: 'loved_one' as const,
+    label: 'A loved one',
+    glyph: '❤',
+    blurb: 'A parent, sister or friend who just wants to know how you are doing today.',
+    defaults: ['feeling'],
+  },
+  {
+    key: 'care_team' as const,
+    label: 'Care team',
+    glyph: '✚',
+    blurb: 'A doctor, ND or coach. Share the patterns and symptoms worth acting on.',
+    defaults: ['symptoms', 'health_intel'],
+  },
+]
+
+export const shareFields = [
+  { key: 'feeling', label: 'How I\'m feeling today', desc: 'Today\'s check-in and mood' },
+  { key: 'cycle', label: 'Cycle phase & fertile window', desc: 'Added quietly to their calendar, no need to announce it' },
+  { key: 'symptoms', label: 'Symptoms', desc: 'What I log day to day' },
+  { key: 'health_intel', label: 'Health intelligence', desc: 'Patterns and prompts worth raising with a clinician' },
+  { key: 'plan', label: 'Recovery & training plan', desc: 'What my day is built around' },
+]
+
 export const tiers = [
   {
     id: 'free' as const,

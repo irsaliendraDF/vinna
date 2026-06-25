@@ -32,6 +32,17 @@ export interface LogEntry {
   createdAt: string
 }
 
+export type ShareAudience = 'partner' | 'loved_one' | 'care_team'
+
+export interface Share {
+  id: string
+  name: string
+  email: string
+  audience: ShareAudience
+  fields: string[]        // keys from shareFields that this person can see
+  createdAt: string
+}
+
 export interface JournalEntry {
   id: string
   text: string            // the full entry, typed or spoken

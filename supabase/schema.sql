@@ -59,6 +59,17 @@ create table if not exists public.journal (
   created_at  timestamptz default now()
 );
 
+-- Share-your-plan invites (who can see what; sending the email is illustrative)
+create table if not exists public.shares (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  name        text,
+  email       text,
+  audience    text,             -- 'partner' | 'loved_one' | 'care_team'
+  fields      text[] default '{}',
+  created_at  timestamptz default now()
+);
+
 -- Product feedback from testers (read all rows in the dashboard, not in-app)
 create table if not exists public.feedback (
   id          uuid primary key default gen_random_uuid(),
@@ -83,6 +94,7 @@ alter table public.feel_checks enable row level security;
 alter table public.logs       enable row level security;
 alter table public.saves      enable row level security;
 alter table public.journal    enable row level security;
+alter table public.shares     enable row level security;
 alter table public.feedback   enable row level security;
 
 -- profiles
@@ -120,6 +132,14 @@ drop policy if exists "own journal delete" on public.journal;
 create policy "own journal read"   on public.journal for select to authenticated using (auth.uid() = user_id);
 create policy "own journal write"  on public.journal for insert to authenticated with check (auth.uid() = user_id);
 create policy "own journal delete" on public.journal for delete to authenticated using (auth.uid() = user_id);
+
+-- shares
+drop policy if exists "own shares read"   on public.shares;
+drop policy if exists "own shares write"  on public.shares;
+drop policy if exists "own shares delete" on public.shares;
+create policy "own shares read"   on public.shares for select to authenticated using (auth.uid() = user_id);
+create policy "own shares write"  on public.shares for insert to authenticated with check (auth.uid() = user_id);
+create policy "own shares delete" on public.shares for delete to authenticated using (auth.uid() = user_id);
 
 -- feedback (testers write their own; you read everything from the dashboard)
 drop policy if exists "own feedback write" on public.feedback;
