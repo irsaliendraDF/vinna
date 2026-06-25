@@ -26,7 +26,7 @@ const titleFor = (id: string) =>
   id
 
 export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void }) {
-  const { profile, logs, feelChecks, saves, journal } = useApp()
+  const { profile, logs, feelChecks, saves, journal, addAppointmentNote } = useApp()
   const [sub, setSub] = useState<Sub>('history')
   const [hist, setHist] = useState<'all' | 'recipe' | 'herb' | 'symptom' | 'journal'>('all')
   const [pat, setPat] = useState<'all' | 'energy' | 'nutrition' | 'cycle' | 'sleep'>('all')
@@ -34,10 +34,11 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
   const [feedback, setFeedback] = useState(false)
 
   // merged history feed
+  type Convert = { title: string; body: string } | undefined
   const feed = [
-    ...logs.map(l => ({ kind: l.itemKind as string, when: l.createdAt, title: l.itemTitle, sub: `Logged · Day ${l.cycleDay}`, ratings: l.ratings })),
-    ...feelChecks.map(f => ({ kind: 'symptom', when: f.createdAt, title: `Feel check · ${moodMeta[f.mood].label}`, sub: f.symptoms.join(' · ') || `Day ${f.cycleDay}`, ratings: undefined as undefined | Record<string, string> })),
-    ...journal.map(j => ({ kind: 'journal', when: j.createdAt, title: 'Journal entry', sub: j.summary || j.text, ratings: undefined as undefined | Record<string, string> })),
+    ...logs.map(l => ({ kind: l.itemKind as string, when: l.createdAt, title: l.itemTitle, sub: `Logged · Day ${l.cycleDay}`, ratings: l.ratings, convert: undefined as Convert })),
+    ...feelChecks.map(f => ({ kind: 'symptom', when: f.createdAt, title: `Feel check · ${moodMeta[f.mood].label}`, sub: f.symptoms.join(' · ') || `Day ${f.cycleDay}`, ratings: undefined as undefined | Record<string, string>, convert: undefined as Convert })),
+    ...journal.map(j => ({ kind: 'journal', when: j.createdAt, title: 'Journal entry', sub: j.summary || j.text, ratings: undefined as undefined | Record<string, string>, convert: { title: 'From my journal', body: j.summary || j.text } as Convert })),
   ].sort((a, b) => +new Date(b.when) - +new Date(a.when))
   const feedFiltered = hist === 'all' ? feed : feed.filter(f => f.kind === hist)
   const patFiltered = pat === 'all' ? patterns : patterns.filter(p => p.cat === pat)
@@ -114,6 +115,15 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
                       <span className="v-meta">{relTime(f.when)}</span>
                     </div>
                     <p className="v-body-sm" style={{ marginTop: 4 }}>{f.sub}</p>
+                    {f.convert && (
+                      <button
+                        className="btn-ghost"
+                        style={{ marginTop: 10, fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, color: 'var(--fg-accent)' }}
+                        onClick={() => { addAppointmentNote({ source: 'journal', title: f.convert!.title, body: f.convert!.body }); toast('Added to your appointment notes.') }}
+                      >
+                        + Turn into an appointment note
+                      </button>
+                    )}
                     {f.ratings && Object.keys(f.ratings).length > 0 && (
                       <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>
                         {Object.entries(f.ratings).map(([k, v]) => (
