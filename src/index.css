@@ -533,6 +533,21 @@ input, select, textarea { font-family: inherit; }
 .fyt-tile .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--fg-3); }
 .fyt-tile .ttl { font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--fg-1); line-height: 1.3; }
 
+/* Challenge progress bar (Community) */
+.progress-bar {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--vinna-bark);
+  overflow: hidden;
+}
+.progress-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--vinna-rust);
+  transition: width var(--dur-reveal) var(--ease-reveal);
+}
+
 /* ==========================================================================
    BOTTOM TAB BAR
    ========================================================================== */
@@ -559,7 +574,7 @@ input, select, textarea { font-family: inherit; }
   transition: color var(--dur-hover);
 }
 .tab .glyph { font-size: 17px; font-family: var(--font-mono); line-height: 1; }
-.tab .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.tab .lbl { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
 .tab.on { color: var(--vinna-rust); }
 .tabbar.raw .tab { color: var(--raw-ink-3); }
 .tabbar.raw .tab.on { color: var(--vinna-rust); }

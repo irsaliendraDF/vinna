@@ -1,8 +1,9 @@
-export type Tab = 'today' | 'track' | 'library' | 'you'
+export type Tab = 'today' | 'track' | 'community' | 'library' | 'you'
 
 const TABS: { id: Tab; glyph: string; label: string }[] = [
   { id: 'today', glyph: '◉', label: 'Today' },
   { id: 'track', glyph: '○', label: 'Track' },
+  { id: 'community', glyph: '⬡', label: 'Community' },
   { id: 'library', glyph: '◈', label: 'Library' },
   { id: 'you', glyph: '◇', label: 'You' },
 ]

@@ -326,6 +326,80 @@ export const patterns = [
   },
 ]
 
+/* Community: synced sources, challenges you're in, your clubs, and clubs to discover.
+   All illustrative for the demo, joining is local-only. */
+export const communitySources = [
+  { id: 'strava', name: 'Strava', glyph: '◐', status: 'Synced', note: 'Rides, runs & club challenges' },
+  { id: 'peloton', name: 'Peloton', glyph: '◑', status: 'Connect', note: 'Classes & power zone groups' },
+  { id: 'calendar', name: 'Calendar', glyph: '▣', status: 'Synced', note: 'Local women\'s events & meetups' },
+]
+
+export const communityChallenges = [
+  {
+    id: 'climb-80',
+    title: '80km Climbing Challenge',
+    source: 'Strava',
+    members: 412,
+    progress: 0.62,
+    blurb: 'Log the vert toward your Haleakalā goal. Synced from your Strava rides.',
+  },
+  {
+    id: 'iron-reset',
+    title: '7-day Iron Reset',
+    source: 'Vinna',
+    members: 1890,
+    progress: 0.28,
+    blurb: 'An iron-forward week built for the early days of your cycle. Recipes track automatically.',
+  },
+]
+
+export const communityClubs = [
+  // joined: your clubs
+  {
+    id: 'cycle-synced-cyclists',
+    name: 'Cycle-Synced Cyclists',
+    members: 2740,
+    blurb: 'Endurance women training with their cycle, not against it. Weekly ride threads.',
+    access: 'active' as const,
+    source: 'Strava',
+    joined: true,
+  },
+  // discover
+  {
+    id: 'luteal-rest-circle',
+    name: 'Luteal Rest Circle',
+    members: 1240,
+    blurb: 'A quiet, read-only space for permission to rest in the luteal phase. No pressure to post.',
+    access: 'read-only' as const,
+    joined: false,
+  },
+  {
+    id: 'perimenopause-strength',
+    name: 'Perimenopause & Strength',
+    members: 3110,
+    blurb: 'Lifting through the change. Plain-language form tips and a kind, no-ego thread.',
+    access: 'active' as const,
+    joined: false,
+  },
+  {
+    id: 'endurance-women',
+    name: 'Endurance Women',
+    members: 5630,
+    blurb: 'Long-course training, fuelling and recovery for women. Linked to your Strava clubs.',
+    access: 'active' as const,
+    source: 'Strava',
+    joined: false,
+  },
+  {
+    id: 'first-cycle-first-bike',
+    name: 'First Cycle, First Bike',
+    members: 880,
+    blurb: 'New to both cycling and cycle-tracking. A gentle, beginner-first circle.',
+    access: 'read-only' as const,
+    joined: false,
+  },
+]
+
 export const tiers = [
   {
     id: 'free' as const,

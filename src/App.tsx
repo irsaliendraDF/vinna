@@ -6,6 +6,7 @@ import { Paywall } from './components/Paywall'
 import { Onboarding } from './screens/Onboarding'
 import { Today } from './screens/Today'
 import { Track } from './screens/Track'
+import { Community } from './screens/Community'
 import { Library } from './screens/Library'
 import { You } from './screens/You'
 
@@ -49,6 +50,7 @@ export default function App() {
             <div key={tab} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               {tab === 'today' && <Today openPaywall={openPaywall} toast={fireToast} goTab={setTab} />}
               {tab === 'track' && <Track openPaywall={openPaywall} />}
+              {tab === 'community' && <Community toast={fireToast} />}
               {tab === 'library' && <Library toast={fireToast} />}
               {tab === 'you' && <You openPaywall={openPaywall} toast={fireToast} />}
             </div>
