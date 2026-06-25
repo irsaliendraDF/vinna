@@ -2,6 +2,7 @@ export type Mood = 'great' | 'okay' | 'low' | 'pain' | 'tired'
 export type Rating = 'none' | 'some' | 'yes'
 export type Tier = 'free' | 'plus' | 'deep'
 export type NeedFilter = 'energy' | 'phase' | 'load' | 'recovery' | 'calm'
+export type MealType = 'breakfast' | 'smoothie' | 'lunch' | 'snack' | 'dinner'
 
 export interface Profile {
   name: string
@@ -77,6 +78,7 @@ export interface Recipe {
   glyph: string
   why: string            // "Why this today"
   needs: NeedFilter[]
+  meal: MealType
   time: string
   tags: string[]
   nutrients: { label: string; value: string }[]

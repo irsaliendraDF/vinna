@@ -1,4 +1,4 @@
-import type { Herb, Recipe, Profile, NeedFilter } from './types'
+import type { Herb, Recipe, Profile, NeedFilter, MealType } from './types'
 
 /* The demo world: Aga, Edmonton, Day 1 Menstrual, training for an 80km Haleakalā ride. */
 export const demoProfile: Profile = {
@@ -16,6 +16,14 @@ export const needLabels: Record<NeedFilter, string> = {
   load: 'Big load',
   recovery: 'Recovery',
   calm: 'Calm + sleep',
+}
+
+export const mealLabels: Record<MealType, string> = {
+  breakfast: 'Breakfast',
+  smoothie: 'Smoothie',
+  lunch: 'Lunch',
+  snack: 'Snack',
+  dinner: 'Dinner',
 }
 
 export const moodMeta = {
@@ -123,6 +131,7 @@ export const recipes: Recipe[] = [
     glyph: '❧',
     why: 'Day 1 is when iron stores are most drawn on. This bowl pairs heme and plant iron with citrus to help your body take it up, so the dip you feel on heavy days has somewhere to land.',
     needs: ['energy', 'phase', 'recovery'],
+    meal: 'dinner',
     time: '25 min',
     tags: ['Iron', 'Protein', 'Day 1'],
     nutrients: [
@@ -152,6 +161,7 @@ export const recipes: Recipe[] = [
     glyph: '❧',
     why: 'After a long ride your legs are clearing the load of the effort. Tart cherry is traditionally used to support overnight recovery, and the protein here gives muscle something to rebuild with.',
     needs: ['recovery', 'load'],
+    meal: 'smoothie',
     time: '5 min',
     tags: ['Recovery', 'Post-ride'],
     nutrients: [
@@ -179,6 +189,7 @@ export const recipes: Recipe[] = [
     glyph: '❧',
     why: 'A warm, settling start on a cramp-y morning. Ginger is traditionally used to ease period discomfort, and slow oats keep your energy even rather than spiking.',
     needs: ['phase', 'calm', 'energy'],
+    meal: 'breakfast',
     time: '10 min',
     tags: ['Breakfast', 'Calm', 'Day 1'],
     nutrients: [
@@ -206,6 +217,7 @@ export const recipes: Recipe[] = [
     glyph: '❧',
     why: 'For the long climb. Beetroot is rich in nitrate, which sits in the pathways behind blood flow. Take it well before the ride, and only after you have tested it in training.',
     needs: ['energy', 'load'],
+    meal: 'smoothie',
     time: '5 min',
     tags: ['Pre-ride', 'Endurance'],
     nutrients: [
@@ -219,6 +231,63 @@ export const recipes: Recipe[] = [
       'Take 2–3 hours before a long effort.',
     ],
     evidence: 'Evidence reviewed · 4 RCTs cited',
+  },
+  {
+    id: 'lentil-beet-salad',
+    title: 'Lentil & roasted beet power salad',
+    glyph: '❧',
+    why: 'A midday plate that keeps iron coming in without weighing you down. Lentils and beets bring plant iron, and the lemon and pepper alongside help your body absorb it through the afternoon.',
+    needs: ['energy', 'phase'],
+    meal: 'lunch',
+    time: '20 min',
+    tags: ['Iron', 'Plant-based', 'Day 1'],
+    nutrients: [
+      { label: 'Iron', value: 'High' },
+      { label: 'Fibre', value: 'High' },
+      { label: 'Vitamin C', value: 'Good' },
+    ],
+    ingredients: [
+      '1 cup cooked puy lentils',
+      '1 roasted beetroot, diced',
+      '2 handfuls rocket',
+      'Half a red pepper',
+      'Juice of half a lemon',
+      'Pumpkin seeds, olive oil',
+    ],
+    method: [
+      'Toss lentils, beet and rocket with olive oil.',
+      'Add red pepper and a good squeeze of lemon.',
+      'Scatter pumpkin seeds over the top.',
+    ],
+    evidence: 'Clinically reviewed',
+  },
+  {
+    id: 'seed-date-bites',
+    title: 'Pumpkin seed & date bites',
+    glyph: '❧',
+    why: 'A small afternoon lift that does not spike then crash you. Pumpkin seeds add a little plant iron and magnesium, and the dates carry it with steady, slow sugar.',
+    needs: ['energy', 'calm'],
+    meal: 'snack',
+    time: '10 min',
+    tags: ['Snack', 'Magnesium', 'No-bake'],
+    nutrients: [
+      { label: 'Magnesium', value: 'Good' },
+      { label: 'Iron', value: 'Some' },
+      { label: 'Added sugar', value: 'None' },
+    ],
+    ingredients: [
+      '8 medjool dates, pitted',
+      'Half a cup pumpkin seeds',
+      '2 tbsp cocoa',
+      'Pinch of salt',
+      'Splash of water if needed',
+    ],
+    method: [
+      'Blitz everything in a food processor until it clumps.',
+      'Roll into small bites.',
+      'Chill for ten minutes before eating.',
+    ],
+    evidence: 'Evidence reviewed · 2 studies',
   },
 ]
 

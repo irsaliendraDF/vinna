@@ -2,15 +2,17 @@ import { useState } from 'react'
 import { useApp } from '../lib/store'
 import { TopBar } from '../components/TopBar'
 import { Eyebrow, Badge, Btn } from '../components/ui'
-import { herbs, recipes, innovations, needLabels } from '../lib/data'
-import type { Herb, NeedFilter, Rating, Recipe } from '../lib/types'
+import { herbs, recipes, innovations, needLabels, mealLabels } from '../lib/data'
+import type { Herb, MealType, NeedFilter, Rating, Recipe } from '../lib/types'
 
 type Sub = 'herbal' | 'recipes' | 'new'
 const NEEDS: NeedFilter[] = ['energy', 'phase', 'load', 'recovery', 'calm']
+const MEALS: MealType[] = ['breakfast', 'smoothie', 'lunch', 'snack', 'dinner']
 
 export function Library({ toast }: { toast: (m: string) => void }) {
   const [sub, setSub] = useState<Sub>('herbal')
   const [need, setNeed] = useState<NeedFilter | null>(null)
+  const [meal, setMeal] = useState<MealType | null>(null)
   const [herb, setHerb] = useState<Herb | null>(null)
   const [recipe, setRecipe] = useState<Recipe | null>(null)
 
@@ -18,7 +20,7 @@ export function Library({ toast }: { toast: (m: string) => void }) {
   if (recipe) return <RecipeDetail recipe={recipe} onBack={() => setRecipe(null)} toast={toast} />
 
   const filteredHerbs = need ? herbs.filter(h => h.needs.includes(need)) : herbs
-  const filteredRecipes = need ? recipes.filter(r => r.needs.includes(need)) : recipes
+  const filteredRecipes = meal ? recipes.filter(r => r.meal === meal) : recipes
 
   return (
     <>
@@ -33,17 +35,26 @@ export function Library({ toast }: { toast: (m: string) => void }) {
 
           <div className="row wrap" style={{ gap: 8, marginTop: 20 }}>
             {(['herbal', 'recipes', 'new'] as Sub[]).map(s => (
-              <button key={s} className={`chip ${sub === s ? 'on' : ''}`} onClick={() => { setSub(s); setNeed(null) }}>
+              <button key={s} className={`chip ${sub === s ? 'on' : ''}`} onClick={() => { setSub(s); setNeed(null); setMeal(null) }}>
                 {s === 'herbal' ? 'Herbal' : s === 'recipes' ? 'Recipes' : "What's new"}
               </button>
             ))}
           </div>
 
-          {sub !== 'new' && (
+          {sub === 'herbal' && (
             <div className="row wrap" style={{ gap: 8, marginTop: 14 }}>
               <button className={`chip ${need === null ? 'on' : ''}`} onClick={() => setNeed(null)}>All</button>
               {NEEDS.map(n => (
                 <button key={n} className={`chip ${need === n ? 'on' : ''}`} onClick={() => setNeed(n)}>{needLabels[n]}</button>
+              ))}
+            </div>
+          )}
+
+          {sub === 'recipes' && (
+            <div className="row wrap" style={{ gap: 8, marginTop: 14 }}>
+              <button className={`chip ${meal === null ? 'on' : ''}`} onClick={() => setMeal(null)}>All</button>
+              {MEALS.map(m => (
+                <button key={m} className={`chip ${meal === m ? 'on' : ''}`} onClick={() => setMeal(m)}>{mealLabels[m]}</button>
               ))}
             </div>
           )}
