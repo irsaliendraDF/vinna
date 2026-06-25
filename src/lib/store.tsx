@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { supabase, isSupabaseConfigured } from './supabase'
 import { demoProfile } from './data'
-import type { FeelCheck, JournalEntry, LogEntry, Mood, Profile, Rating, SavedItem, Share, Tier } from './types'
+import type { AppointmentNote, FeelCheck, JournalEntry, LogEntry, Mood, Profile, Rating, SavedItem, Share, Tier } from './types'
 
 interface AppUser { id: string; email: string; isDemo: boolean }
 
@@ -14,6 +14,7 @@ interface AppState {
   saves: SavedItem[]
   journal: JournalEntry[]
   shares: Share[]
+  appointmentNotes: AppointmentNote[]
   // auth
   signUp: (email: string, password: string, name?: string) => Promise<string | null>
   signIn: (email: string, password: string) => Promise<string | null>
@@ -25,6 +26,8 @@ interface AppState {
   addJournalEntry: (text: string, summary?: string) => void
   addShare: (share: Omit<Share, 'id' | 'createdAt'>) => void
   removeShare: (id: string) => void
+  addAppointmentNote: (note: Omit<AppointmentNote, 'id' | 'createdAt'>) => void
+  removeAppointmentNote: (id: string) => void
   addLog: (itemId: string, itemTitle: string, itemKind: 'herb' | 'recipe', mood?: Mood, ratings?: Record<string, Rating>) => void
   toggleSave: (itemId: string, itemKind: SavedItem['itemKind']) => void
   isSaved: (itemId: string) => boolean
@@ -98,6 +101,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [saves, setSaves] = useState<SavedItem[]>([])
   const [journal, setJournal] = useState<JournalEntry[]>([])
   const [shares, setShares] = useState<Share[]>([])
+  const [appointmentNotes, setAppointmentNotes] = useState<AppointmentNote[]>([])
   const [consent, setConsentState] = useState<boolean>(() => {
     try { return localStorage.getItem('vinna_consent') !== 'false' } catch { return true }
   })
@@ -115,6 +119,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSaves(cached.saves ?? [])
       setJournal(cached.journal ?? [])
       setShares(cached.shares ?? [])
+      setAppointmentNotes(cached.appointmentNotes ?? [])
     } else {
       const seed = seedData()
       setProfile(withName(demoProfile))
@@ -123,6 +128,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSaves(seed.saves)
       setJournal(seed.journal)
       setShares(seed.shares)
+      setAppointmentNotes([])
     }
   }
 
@@ -158,9 +164,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // persist to local cache + mirror to Supabase when a real user is signed in
   useEffect(() => {
     if (!user) return
-    const snapshot = { profile, feelChecks, logs, saves, journal, shares }
+    const snapshot = { profile, feelChecks, logs, saves, journal, shares, appointmentNotes }
     try { localStorage.setItem(LS(user.id), JSON.stringify(snapshot)) } catch { /* ignore */ }
-  }, [user, profile, feelChecks, logs, saves, journal, shares])
+  }, [user, profile, feelChecks, logs, saves, journal, shares, appointmentNotes])
 
   async function syncRow(table: string, row: Record<string, unknown>) {
     if (!isSupabaseConfigured || !supabase || !user || user.isDemo) return
@@ -180,7 +186,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   const state: AppState = {
-    ready, user, profile, feelChecks, logs, saves, journal, shares,
+    ready, user, profile, feelChecks, logs, saves, journal, shares, appointmentNotes,
 
     async signUp(email, password, name) {
       rememberName(name)
@@ -206,7 +212,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     async signOut() {
       localStorage.removeItem('vinna_guest')
       if (isSupabaseConfigured && supabase) { try { await supabase.auth.signOut() } catch { /* ignore */ } }
-      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([]); setJournal([]); setShares([])
+      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([]); setJournal([]); setShares([]); setAppointmentNotes([])
     },
 
     addFeelCheck(mood, symptoms, note) {
@@ -228,6 +234,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setShares(prev => prev.filter(s => s.id !== id))
       if (isSupabaseConfigured && supabase && user && !user.isDemo) {
         try { supabase.from('shares').delete().eq('id', id).eq('user_id', user.id) } catch { /* best effort */ }
+      }
+    },
+    addAppointmentNote(note) {
+      const entry: AppointmentNote = { id: uid(), createdAt: new Date().toISOString(), ...note }
+      setAppointmentNotes(prev => [entry, ...prev])
+      syncRow('appointment_notes', { title: note.title, body: note.body, source: note.source })
+    },
+    removeAppointmentNote(id) {
+      setAppointmentNotes(prev => prev.filter(n => n.id !== id))
+      if (isSupabaseConfigured && supabase && user && !user.isDemo) {
+        try { supabase.from('appointment_notes').delete().eq('id', id).eq('user_id', user.id) } catch { /* best effort */ }
       }
     },
     addLog(itemId, itemTitle, itemKind, mood, ratings) {
@@ -281,17 +298,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
           await supabase.from('feel_checks').delete().eq('user_id', user.id)
           await supabase.from('journal').delete().eq('user_id', user.id)
           await supabase.from('shares').delete().eq('user_id', user.id)
+          await supabase.from('appointment_notes').delete().eq('user_id', user.id)
           await supabase.from('profiles').delete().eq('id', user.id)
         } catch { /* best effort */ }
       }
       if (user) { try { localStorage.removeItem(LS(user.id)) } catch { /* ignore */ } }
       localStorage.removeItem('vinna_name'); localStorage.removeItem('vinna_guest')
       if (isSupabaseConfigured && supabase) { try { await supabase.auth.signOut() } catch { /* ignore */ } }
-      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([]); setJournal([]); setShares([])
+      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([]); setJournal([]); setShares([]); setAppointmentNotes([])
     },
   }
 
-  const value = useMemo(() => state, [ready, user, profile, feelChecks, logs, saves, journal, shares, consent])
+  const value = useMemo(() => state, [ready, user, profile, feelChecks, logs, saves, journal, shares, appointmentNotes, consent])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 

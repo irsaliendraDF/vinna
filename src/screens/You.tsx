@@ -4,6 +4,7 @@ import { TopBar } from '../components/TopBar'
 import { Eyebrow, Badge, Btn, Sheet } from '../components/ui'
 import { FeedbackSheet, FeedbackAutoPrompt } from '../components/Feedback'
 import { SharePlanCard } from '../components/Share'
+import { AppointmentNotesCard } from '../components/Appointments'
 import { PatternCard } from './Track'
 import { herbs, recipes, patterns, moodMeta, didYouKnow } from '../lib/data'
 
@@ -14,10 +15,14 @@ const relTime = (iso: string) => {
   const d = Math.round((Date.now() - new Date(iso).getTime()) / 864e5)
   return d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`
 }
+const factLabels: Record<string, string> = {
+  'ferritin-iron-infusion': 'Ferritin testing & iron infusions',
+}
 const titleFor = (id: string) =>
   herbs.find(h => h.id === id)?.name ??
   recipes.find(r => r.id === id)?.title ??
   didYouKnow.find(d => d.id === id)?.fact ??
+  factLabels[id] ??
   id
 
 export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void }) {
@@ -70,6 +75,8 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
           </button>
 
           <SharePlanCard toast={toast} />
+
+          <AppointmentNotesCard toast={toast} />
 
           <button className="card accent reveal d1" style={{ marginTop: 12, width: '100%', textAlign: 'left', cursor: 'pointer' }} onClick={() => setFeedback(true)}>
             <div className="row between">

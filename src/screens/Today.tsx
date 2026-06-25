@@ -6,6 +6,7 @@ import { FeelCheck } from '../components/FeelCheck'
 import { Eyebrow, Btn, Badge, Sheet } from '../components/ui'
 import { FeedbackAutoPrompt } from '../components/Feedback'
 import { JournalCard } from '../components/Journal'
+import { FerritinInsightSheet } from '../components/HealthInsight'
 import { symptomSets, didYouKnow, moodMeta } from '../lib/data'
 import type { Mood } from '../lib/types'
 
@@ -24,6 +25,7 @@ export function Today({ openPaywall, toast, goTab }: { openPaywall: (ctx?: strin
   const [rideOpen, setRideOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
   const [nudgeDismissed, setNudgeDismissed] = useState(false)
+  const [insightOpen, setInsightOpen] = useState(false)
   const locked = profile.tier === 'free'
 
   // today's mood drives the ring centre; if checked in, start collapsed
@@ -119,14 +121,14 @@ export function Today({ openPaywall, toast, goTab }: { openPaywall: (ctx?: strin
             <div className="card accent ochre reveal d4" style={{ marginTop: 16 }}>
               <Eyebrow tone="ochre">● Pattern detected</Eyebrow>
               <h3 className="v-card-title" style={{ margin: '12px 0 6px', fontSize: 16 }}>
-                Worth raising at your next appointment
+                You've logged low energy on Day 1–2. Maybe ask about ferritin.
               </h3>
               <p className="v-body-sm">
-                Across your last few cycles your check-ins show stronger Day 1 fatigue than the months before. It is not
-                a diagnosis, just something a clinician might want to know. Vinna can prepare a short summary you can bring.
+                Across your last few cycles your check-ins show stronger early-cycle fatigue than the months before. A
+                common, checkable cause is low iron stores. It is not a diagnosis, just something worth looking into.
               </p>
               <div style={{ marginTop: 16 }}>
-                <Btn sm variant="primary" onClick={() => toast('Summary saved to You → Health intelligence.')}>Prepare summary →</Btn>
+                <Btn sm variant="primary" onClick={() => setInsightOpen(true)}>Learn more →</Btn>
                 <button
                   className="btn-ghost"
                   style={{ display: 'block', marginTop: 12, fontFamily: 'var(--font-mono)', fontSize: 11, letterSpacing: 1, color: 'var(--fg-3)' }}
@@ -143,6 +145,9 @@ export function Today({ openPaywall, toast, goTab }: { openPaywall: (ctx?: strin
           </p>
         </div>
       </div>
+
+      {/* ferritin action chain, opened from the health-intelligence nudge */}
+      <FerritinInsightSheet open={insightOpen} onClose={() => setInsightOpen(false)} toast={toast} />
 
       {/* first-tester feedback, auto-opens 3s after the screen loads */}
       <FeedbackAutoPrompt toast={toast} />

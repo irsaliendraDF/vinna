@@ -52,6 +52,14 @@ export interface JournalEntry {
   createdAt: string
 }
 
+export interface AppointmentNote {
+  id: string
+  title: string
+  body: string
+  source: 'insight' | 'journal' | 'manual'
+  createdAt: string
+}
+
 export interface SavedItem {
   id: string
   itemId: string

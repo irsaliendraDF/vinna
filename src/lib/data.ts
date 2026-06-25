@@ -395,6 +395,27 @@ export const patterns = [
   },
 ]
 
+/* Health intelligence: the ferritin action chain. Pattern -> why -> what to do.
+   Providers are illustrative (Edmonton, Aga's city). */
+export const ferritinInsight = {
+  pattern:
+    'Across your last few cycles your check-ins show stronger low energy on Days 1 to 2 than the months before.',
+  whyFerritin:
+    'Ferritin is the marker for your iron stores. It can sit low in menstruating and endurance women well before a standard iron test looks off, and low ferritin is a common, checkable cause of low energy and flat training. A simple blood test covers it.',
+  ifLow:
+    'If your ferritin comes back low, supplements are not the only route. In some provinces, iron infusions are publicly covered once ferritin drops below a set level, and they can rebuild stores faster than tablets for some women.',
+  caution:
+    'This is educational, not a diagnosis. Your care team decides what testing and treatment is right for you.',
+}
+
+export const ironProviders = [
+  { id: 'kingsway-lab', name: 'Kingsway Lab & Bloodwork', type: 'Lab', distance: '1.2 km', note: 'Walk-in ferritin panel with a requisition.', covered: true },
+  { id: 'rivervalley-iron', name: 'RiverValley Iron Infusion Clinic', type: 'Infusion clinic', distance: '3.4 km', note: 'IV iron, publicly covered with low ferritin and a referral.', covered: true },
+  { id: 'glenora-womens', name: 'Glenora Women\'s Health', type: 'Family clinic', distance: '4.0 km', note: 'Family physicians who can order ferritin testing.', covered: true },
+  { id: 'north-sask-nd', name: 'North Sask Naturopathic', type: 'Naturopath', distance: '5.1 km', note: 'Iron-focused workup, private fees apply.', covered: false },
+  { id: 'uni-hematology', name: 'University Hospital Hematology', type: 'Specialist', distance: '6.7 km', note: 'Referral pathway for persistent low iron.', covered: true },
+]
+
 /* Community: synced sources, challenges you're in, your clubs, and clubs to discover.
    All illustrative for the demo, joining is local-only. */
 export const communitySources = [

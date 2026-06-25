@@ -70,6 +70,16 @@ create table if not exists public.shares (
   created_at  timestamptz default now()
 );
 
+-- Appointment notes: things to bring to a doctor (from insights, journal, or typed)
+create table if not exists public.appointment_notes (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  title       text,
+  body        text,
+  source      text,             -- 'insight' | 'journal' | 'manual'
+  created_at  timestamptz default now()
+);
+
 -- Product feedback from testers (read all rows in the dashboard, not in-app)
 create table if not exists public.feedback (
   id          uuid primary key default gen_random_uuid(),
@@ -95,6 +105,7 @@ alter table public.logs       enable row level security;
 alter table public.saves      enable row level security;
 alter table public.journal    enable row level security;
 alter table public.shares     enable row level security;
+alter table public.appointment_notes enable row level security;
 alter table public.feedback   enable row level security;
 
 -- profiles
@@ -140,6 +151,14 @@ drop policy if exists "own shares delete" on public.shares;
 create policy "own shares read"   on public.shares for select to authenticated using (auth.uid() = user_id);
 create policy "own shares write"  on public.shares for insert to authenticated with check (auth.uid() = user_id);
 create policy "own shares delete" on public.shares for delete to authenticated using (auth.uid() = user_id);
+
+-- appointment_notes
+drop policy if exists "own appt read"   on public.appointment_notes;
+drop policy if exists "own appt write"  on public.appointment_notes;
+drop policy if exists "own appt delete" on public.appointment_notes;
+create policy "own appt read"   on public.appointment_notes for select to authenticated using (auth.uid() = user_id);
+create policy "own appt write"  on public.appointment_notes for insert to authenticated with check (auth.uid() = user_id);
+create policy "own appt delete" on public.appointment_notes for delete to authenticated using (auth.uid() = user_id);
 
 -- feedback (testers write their own; you read everything from the dashboard)
 drop policy if exists "own feedback write" on public.feedback;
