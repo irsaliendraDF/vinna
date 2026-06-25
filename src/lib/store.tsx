@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { supabase, isSupabaseConfigured } from './supabase'
 import { demoProfile } from './data'
-import type { FeelCheck, LogEntry, Mood, Profile, Rating, SavedItem, Tier } from './types'
+import type { FeelCheck, JournalEntry, LogEntry, Mood, Profile, Rating, SavedItem, Tier } from './types'
 
 interface AppUser { id: string; email: string; isDemo: boolean }
 
@@ -12,6 +12,7 @@ interface AppState {
   feelChecks: FeelCheck[]
   logs: LogEntry[]
   saves: SavedItem[]
+  journal: JournalEntry[]
   // auth
   signUp: (email: string, password: string, name?: string) => Promise<string | null>
   signIn: (email: string, password: string) => Promise<string | null>
@@ -20,6 +21,7 @@ interface AppState {
   signOut: () => Promise<void>
   // data
   addFeelCheck: (mood: Mood, symptoms: string[], note?: string) => void
+  addJournalEntry: (text: string, summary?: string) => void
   addLog: (itemId: string, itemTitle: string, itemKind: 'herb' | 'recipe', mood?: Mood, ratings?: Record<string, Rating>) => void
   toggleSave: (itemId: string, itemKind: SavedItem['itemKind']) => void
   isSaved: (itemId: string) => boolean
@@ -42,12 +44,21 @@ const firstName = (full: string) => {
   return w ? w.charAt(0).toUpperCase() + w.slice(1) : ''
 }
 
-function seedData(): { feelChecks: FeelCheck[]; logs: LogEntry[]; saves: SavedItem[] } {
+function seedData(): { feelChecks: FeelCheck[]; logs: LogEntry[]; saves: SavedItem[]; journal: JournalEntry[] } {
   return {
     feelChecks: [
       { id: uid(), mood: 'tired', symptoms: ['Cramps', 'Fatigue'], cycleDay: 1, createdAt: daysAgo(0) },
       { id: uid(), mood: 'okay', symptoms: ['Steady energy'], cycleDay: 26, createdAt: daysAgo(3) },
       { id: uid(), mood: 'great', symptoms: ['Good sleep', 'Strong legs'], cycleDay: 18, createdAt: daysAgo(11) },
+    ],
+    journal: [
+      {
+        id: uid(),
+        text: 'First day of my cycle and the cramps hit hard this morning. I made the ginger oats before my easy spin and they really did settle my stomach. Energy was low all afternoon so I kept the ride gentle instead of pushing the climb like I planned. Feeling a bit better tonight after magnesium.',
+        summary: 'Day 1 cramps eased after ginger oats. Energy low, so kept the ride gentle. Better by evening after magnesium.',
+        cycleDay: 1,
+        createdAt: daysAgo(0),
+      },
     ],
     logs: [
       { id: uid(), itemId: 'ginger', itemTitle: 'Ginger', itemKind: 'herb', cycleDay: 1, mood: 'tired', ratings: { 'Cramp relief': 'yes' }, createdAt: daysAgo(0) },
@@ -79,6 +90,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [feelChecks, setFeelChecks] = useState<FeelCheck[]>([])
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [saves, setSaves] = useState<SavedItem[]>([])
+  const [journal, setJournal] = useState<JournalEntry[]>([])
   const [consent, setConsentState] = useState<boolean>(() => {
     try { return localStorage.getItem('vinna_consent') !== 'false' } catch { return true }
   })
@@ -94,12 +106,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setFeelChecks(cached.feelChecks ?? [])
       setLogs(cached.logs ?? [])
       setSaves(cached.saves ?? [])
+      setJournal(cached.journal ?? [])
     } else {
       const seed = seedData()
       setProfile(withName(demoProfile))
       setFeelChecks(seed.feelChecks)
       setLogs(seed.logs)
       setSaves(seed.saves)
+      setJournal(seed.journal)
     }
   }
 
@@ -135,9 +149,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // persist to local cache + mirror to Supabase when a real user is signed in
   useEffect(() => {
     if (!user) return
-    const snapshot = { profile, feelChecks, logs, saves }
+    const snapshot = { profile, feelChecks, logs, saves, journal }
     try { localStorage.setItem(LS(user.id), JSON.stringify(snapshot)) } catch { /* ignore */ }
-  }, [user, profile, feelChecks, logs, saves])
+  }, [user, profile, feelChecks, logs, saves, journal])
 
   async function syncRow(table: string, row: Record<string, unknown>) {
     if (!isSupabaseConfigured || !supabase || !user || user.isDemo) return
@@ -157,7 +171,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   const state: AppState = {
-    ready, user, profile, feelChecks, logs, saves,
+    ready, user, profile, feelChecks, logs, saves, journal,
 
     async signUp(email, password, name) {
       rememberName(name)
@@ -183,13 +197,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     async signOut() {
       localStorage.removeItem('vinna_guest')
       if (isSupabaseConfigured && supabase) { try { await supabase.auth.signOut() } catch { /* ignore */ } }
-      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([])
+      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([]); setJournal([])
     },
 
     addFeelCheck(mood, symptoms, note) {
       const fc: FeelCheck = { id: uid(), mood, symptoms, note, cycleDay: profile.cycleDay, createdAt: new Date().toISOString() }
       setFeelChecks(prev => [fc, ...prev])
       syncRow('feel_checks', { mood, symptoms, note: note ?? null, cycle_day: profile.cycleDay })
+    },
+    addJournalEntry(text, summary) {
+      const entry: JournalEntry = { id: uid(), text, summary, cycleDay: profile.cycleDay, createdAt: new Date().toISOString() }
+      setJournal(prev => [entry, ...prev])
+      syncRow('journal', { text, summary: summary ?? null, cycle_day: profile.cycleDay })
     },
     addLog(itemId, itemTitle, itemKind, mood, ratings) {
       const entry: LogEntry = { id: uid(), itemId, itemTitle, itemKind, cycleDay: profile.cycleDay, mood, ratings, createdAt: new Date().toISOString() }
@@ -240,17 +259,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
           await supabase.from('saves').delete().eq('user_id', user.id)
           await supabase.from('logs').delete().eq('user_id', user.id)
           await supabase.from('feel_checks').delete().eq('user_id', user.id)
+          await supabase.from('journal').delete().eq('user_id', user.id)
           await supabase.from('profiles').delete().eq('id', user.id)
         } catch { /* best effort */ }
       }
       if (user) { try { localStorage.removeItem(LS(user.id)) } catch { /* ignore */ } }
       localStorage.removeItem('vinna_name'); localStorage.removeItem('vinna_guest')
       if (isSupabaseConfigured && supabase) { try { await supabase.auth.signOut() } catch { /* ignore */ } }
-      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([])
+      setUser(null); setProfile(demoProfile); setFeelChecks([]); setLogs([]); setSaves([]); setJournal([])
     },
   }
 
-  const value = useMemo(() => state, [ready, user, profile, feelChecks, logs, saves, consent])
+  const value = useMemo(() => state, [ready, user, profile, feelChecks, logs, saves, journal, consent])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 

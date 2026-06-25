@@ -49,6 +49,16 @@ create table if not exists public.saves (
   created_at  timestamptz default now()
 );
 
+-- Journal entries (typed or spoken, with an optional Vinna summary)
+create table if not exists public.journal (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  text        text not null,
+  summary     text,
+  cycle_day   int,
+  created_at  timestamptz default now()
+);
+
 -- Product feedback from testers (read all rows in the dashboard, not in-app)
 create table if not exists public.feedback (
   id          uuid primary key default gen_random_uuid(),
@@ -72,6 +82,7 @@ alter table public.profiles   enable row level security;
 alter table public.feel_checks enable row level security;
 alter table public.logs       enable row level security;
 alter table public.saves      enable row level security;
+alter table public.journal    enable row level security;
 alter table public.feedback   enable row level security;
 
 -- profiles
@@ -101,6 +112,14 @@ drop policy if exists "own saves delete" on public.saves;
 create policy "own saves read"   on public.saves for select to authenticated using (auth.uid() = user_id);
 create policy "own saves write"  on public.saves for insert to authenticated with check (auth.uid() = user_id);
 create policy "own saves delete" on public.saves for delete to authenticated using (auth.uid() = user_id);
+
+-- journal
+drop policy if exists "own journal read"   on public.journal;
+drop policy if exists "own journal write"  on public.journal;
+drop policy if exists "own journal delete" on public.journal;
+create policy "own journal read"   on public.journal for select to authenticated using (auth.uid() = user_id);
+create policy "own journal write"  on public.journal for insert to authenticated with check (auth.uid() = user_id);
+create policy "own journal delete" on public.journal for delete to authenticated using (auth.uid() = user_id);
 
 -- feedback (testers write their own; you read everything from the dashboard)
 drop policy if exists "own feedback write" on public.feedback;

@@ -5,6 +5,7 @@ import { TopBar } from '../components/TopBar'
 import { FeelCheck } from '../components/FeelCheck'
 import { Eyebrow, Btn, Badge, Sheet } from '../components/ui'
 import { FeedbackAutoPrompt } from '../components/Feedback'
+import { JournalCard } from '../components/Journal'
 import { symptomSets, didYouKnow, moodMeta } from '../lib/data'
 import type { Mood } from '../lib/types'
 
@@ -86,6 +87,11 @@ export function Today({ openPaywall, toast, goTab }: { openPaywall: (ctx?: strin
                 <span className="ttl">Easy pacing for your ride</span>
               </button>
             </div>
+          </div>
+
+          {/* journal, type or speak then summarize */}
+          <div className="reveal d3" style={{ marginTop: 16 }}>
+            <JournalCard toast={toast} />
           </div>
 
           {/* did you know, research as a quick read */}

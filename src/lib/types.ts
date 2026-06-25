@@ -32,6 +32,14 @@ export interface LogEntry {
   createdAt: string
 }
 
+export interface JournalEntry {
+  id: string
+  text: string            // the full entry, typed or spoken
+  summary?: string        // the short "summarized with Vinna" version
+  cycleDay: number
+  createdAt: string
+}
+
 export interface SavedItem {
   id: string
   itemId: string

@@ -20,9 +20,9 @@ const titleFor = (id: string) =>
   id
 
 export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void }) {
-  const { profile, logs, feelChecks, saves } = useApp()
+  const { profile, logs, feelChecks, saves, journal } = useApp()
   const [sub, setSub] = useState<Sub>('history')
-  const [hist, setHist] = useState<'all' | 'recipe' | 'herb' | 'symptom'>('all')
+  const [hist, setHist] = useState<'all' | 'recipe' | 'herb' | 'symptom' | 'journal'>('all')
   const [pat, setPat] = useState<'all' | 'energy' | 'nutrition' | 'cycle' | 'sleep'>('all')
   const [settings, setSettings] = useState(false)
   const [feedback, setFeedback] = useState(false)
@@ -31,6 +31,7 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
   const feed = [
     ...logs.map(l => ({ kind: l.itemKind as string, when: l.createdAt, title: l.itemTitle, sub: `Logged · Day ${l.cycleDay}`, ratings: l.ratings })),
     ...feelChecks.map(f => ({ kind: 'symptom', when: f.createdAt, title: `Feel check · ${moodMeta[f.mood].label}`, sub: f.symptoms.join(' · ') || `Day ${f.cycleDay}`, ratings: undefined as undefined | Record<string, string> })),
+    ...journal.map(j => ({ kind: 'journal', when: j.createdAt, title: 'Journal entry', sub: j.summary || j.text, ratings: undefined as undefined | Record<string, string> })),
   ].sort((a, b) => +new Date(b.when) - +new Date(a.when))
   const feedFiltered = hist === 'all' ? feed : feed.filter(f => f.kind === hist)
   const patFiltered = pat === 'all' ? patterns : patterns.filter(p => p.cat === pat)
@@ -89,9 +90,9 @@ export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => voi
           {sub === 'history' && (
             <div className="reveal" style={{ marginTop: 16 }}>
               <div className="row wrap" style={{ gap: 8, marginBottom: 16 }}>
-                {(['all', 'recipe', 'herb', 'symptom'] as const).map(f => (
+                {(['all', 'recipe', 'herb', 'symptom', 'journal'] as const).map(f => (
                   <button key={f} className={`chip ${hist === f ? 'on' : ''}`} onClick={() => setHist(f)}>
-                    {f === 'all' ? 'All' : f === 'recipe' ? 'Recipes' : f === 'herb' ? 'Herbs' : 'Symptoms'}
+                    {f === 'all' ? 'All' : f === 'recipe' ? 'Recipes' : f === 'herb' ? 'Herbs' : f === 'symptom' ? 'Symptoms' : 'Journal'}
                   </button>
                 ))}
               </div>
