@@ -458,6 +458,82 @@ input, select, textarea { font-family: inherit; }
 .feel.on .lbl { color: var(--fg-1); }
 
 /* ==========================================================================
+   CYCLE RING, home-page hero. Tap to open the feel check.
+   ========================================================================== */
+.cycle-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 6px 0 2px;
+  background: none;
+}
+.cycle-ring svg { display: block; transition: transform var(--dur-hover); }
+.cycle-ring:active svg { transform: scale(0.98); }
+.cycle-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+}
+.cycle-ring-center .glyph {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--vinna-rust);
+  margin-bottom: 6px;
+}
+.cycle-ring-center .glyph.lichen { color: var(--vinna-lichen); }
+.cycle-ring-center .day {
+  font-family: var(--font-display);
+  font-size: 36px;
+  letter-spacing: 1px;
+  line-height: 0.9;
+  color: var(--fg-1);
+  text-transform: uppercase;
+}
+.cycle-ring-center .phase {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.cycle-ring-center .hint {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--fg-accent);
+  margin-top: 9px;
+}
+
+/* "For you today" trio of tiles */
+.fyt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.fyt-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 12px 16px;
+  border-radius: var(--radius-card);
+  background: var(--bg-card);
+  border: 1px solid var(--border-hair);
+  border-top: 3px solid var(--vinna-rust);
+  text-align: left;
+  transition: all var(--dur-hover);
+}
+.fyt-tile.ochre { border-top-color: var(--vinna-ochre); }
+.fyt-tile.lichen { border-top-color: var(--vinna-lichen); }
+.fyt-tile:hover { background: var(--tint-rust); }
+.fyt-tile .glyph { font-family: var(--font-mono); font-size: 18px; line-height: 1; color: var(--fg-1); }
+.fyt-tile .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--fg-3); }
+.fyt-tile .ttl { font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--fg-1); line-height: 1.3; }
+
+/* ==========================================================================
    BOTTOM TAB BAR
    ========================================================================== */
 .tabbar {

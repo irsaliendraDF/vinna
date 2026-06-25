@@ -247,6 +247,41 @@ export const innovations = [
   },
 ]
 
+/* "Did you know" research cards. A quick read on the home page that opens
+   into a longer read and links out to the actual paper. */
+export const didYouKnow = [
+  {
+    id: 'dyk-iron-vitc',
+    eyebrow: '● DID YOU KNOW',
+    fact: 'A squeeze of citrus on your Day 1 meal can roughly double how much plant iron your body actually absorbs.',
+    detail:
+      'Iron from plants (non-heme iron) is poorly absorbed on its own, but vitamin C in the same meal converts it to a form your gut takes up far more readily. The reverse is also true: tea and coffee within an hour of eating can cut absorption sharply. On the heaviest days of your cycle, when iron demand is highest, the timing of what you drink matters as much as what you eat.',
+    source: 'Hurrell & Egli, American Journal of Clinical Nutrition (2010)',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/20200263/',
+    tag: 'Iron · Day 1',
+  },
+  {
+    id: 'dyk-cycle-performance',
+    eyebrow: '● DID YOU KNOW',
+    fact: 'The research on cycle phase and athletic performance is far less settled than most apps imply.',
+    detail:
+      'A 2020 meta-analysis of eumenorrheic women found only a trivial, low-certainty effect of menstrual cycle phase on exercise performance, with wide variation between individuals. The honest takeaway is that your own logged data over a few cycles tells you more than any general rule. That is exactly the kind of pattern Vinna is built to surface for you, rather than handing you someone else\'s average.',
+    source: 'McNulty et al., Sports Medicine (2020)',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/32661839/',
+    tag: 'Performance',
+  },
+  {
+    id: 'dyk-altitude-iron',
+    eyebrow: '● DID YOU KNOW',
+    fact: 'Climbing to altitude raises your body\'s iron demand, which can stack with a heavy cycle.',
+    detail:
+      'At altitude your body makes more red blood cells to cope with thinner air, and that process draws on iron stores. For someone training to climb high during the early, iron-hungry days of a cycle, low ferritin can quietly blunt the adaptation and leave you feeling flat. It is worth knowing your iron status before a big altitude block, and worth raising with your care team if you train high often.',
+    source: 'Research summary · iron status & altitude training',
+    url: 'https://pubmed.ncbi.nlm.nih.gov/?term=iron+status+altitude+training+haemoglobin+mass',
+    tag: 'Altitude',
+  },
+]
+
 /* Pattern cards, the data decides what surfaces. */
 export const patterns = [
   {

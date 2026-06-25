@@ -4,7 +4,7 @@ import { TopBar } from '../components/TopBar'
 import { Eyebrow, Badge, Btn, Sheet } from '../components/ui'
 import { FeedbackSheet, FeedbackAutoPrompt } from '../components/Feedback'
 import { PatternCard } from './Track'
-import { herbs, recipes, patterns, moodMeta } from '../lib/data'
+import { herbs, recipes, patterns, moodMeta, didYouKnow } from '../lib/data'
 
 type Sub = 'history' | 'saved' | 'patterns'
 
@@ -13,7 +13,11 @@ const relTime = (iso: string) => {
   const d = Math.round((Date.now() - new Date(iso).getTime()) / 864e5)
   return d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : `${d} days ago`
 }
-const titleFor = (id: string) => herbs.find(h => h.id === id)?.name ?? recipes.find(r => r.id === id)?.title ?? id
+const titleFor = (id: string) =>
+  herbs.find(h => h.id === id)?.name ??
+  recipes.find(r => r.id === id)?.title ??
+  didYouKnow.find(d => d.id === id)?.fact ??
+  id
 
 export function You({ openPaywall, toast }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void }) {
   const { profile, logs, feelChecks, saves } = useApp()

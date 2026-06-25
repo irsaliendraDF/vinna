@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useApp } from '../lib/store'
+import type { Tab } from '../components/BottomTabBar'
 import { TopBar } from '../components/TopBar'
 import { FeelCheck } from '../components/FeelCheck'
 import { Eyebrow, Btn, Badge, Sheet } from '../components/ui'
 import { FeedbackAutoPrompt } from '../components/Feedback'
-import { symptomSets } from '../lib/data'
+import { symptomSets, didYouKnow, moodMeta } from '../lib/data'
 import type { Mood } from '../lib/types'
 
 const today = new Date().toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric' })
+const CYCLE_LENGTH = 28
 
 function salutation() {
   const h = new Date().getHours()
@@ -16,12 +18,16 @@ function salutation() {
   return 'Good evening'
 }
 
-export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void }) {
-  const { profile, addFeelCheck } = useApp()
+export function Today({ openPaywall, toast, goTab }: { openPaywall: (ctx?: string) => void; toast: (m: string) => void; goTab: (t: Tab) => void }) {
+  const { profile, addFeelCheck, feelChecks } = useApp()
   const [rideOpen, setRideOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
   const [nudgeDismissed, setNudgeDismissed] = useState(false)
   const locked = profile.tier === 'free'
+
+  // today's mood drives the ring centre; if checked in, start collapsed
+  const todayMood = feelChecks.find(f => new Date(f.createdAt).toDateString() === new Date().toDateString())?.mood
+  const [feelOpen, setFeelOpen] = useState(!todayMood)
 
   return (
     <>
@@ -35,24 +41,56 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
             </h1>
           </div>
 
-          {/* cycle status */}
-          <div className="card accent reveal d1" style={{ marginTop: 22 }}>
-            <div className="row between">
-              <Eyebrow>Cycle · Day {profile.cycleDay}</Eyebrow>
-              <Badge tone="rust" dot>{profile.phase}</Badge>
-            </div>
-            <p className="v-body" style={{ marginTop: 12 }}>
-              You're on day {profile.cycleDay} of your cycle, the menstrual phase. Energy often sits low here and that
+          {/* cycle ring, tap to open the feel check */}
+          <div className="reveal d1" style={{ marginTop: 18 }}>
+            <CycleRing
+              cycleDay={profile.cycleDay}
+              phase={profile.phase}
+              mood={todayMood}
+              open={feelOpen}
+              onTap={() => setFeelOpen(o => !o)}
+            />
+            <p className="v-body center" style={{ margin: '4px 12px 0', color: 'var(--fg-2)' }}>
+              You're on day {profile.cycleDay}, the {profile.phase.toLowerCase()} phase. Energy often sits low here and that
               is your body doing exactly what it should. Vinna has front-loaded rest and iron-forward food today.
             </p>
           </div>
 
-          {/* feel check */}
-          <div className="reveal d2" style={{ marginTop: 16 }}>
-            <FeelCheck
-              onDetailed={() => setDetailOpen(true)}
-              onDone={() => toast('Check-in saved. Your day just re-tuned.')}
-            />
+          {/* feel check, opens from the ring */}
+          {feelOpen && (
+            <div className="reveal d2" style={{ marginTop: 16 }}>
+              <FeelCheck
+                onDetailed={() => setDetailOpen(true)}
+                onDone={() => { setFeelOpen(false); toast('Check-in saved. Your day just re-tuned.') }}
+              />
+            </div>
+          )}
+
+          {/* for you today, three doors into what the day asks for */}
+          <div className="reveal d2" style={{ marginTop: 22 }}>
+            <Eyebrow noRule>For you today</Eyebrow>
+            <div className="fyt-grid" style={{ marginTop: 12 }}>
+              <button className="fyt-tile" onClick={() => goTab('library')}>
+                <span className="glyph">❧</span>
+                <span className="lbl">Nutrition</span>
+                <span className="ttl">Iron-forward meals for Day 1</span>
+              </button>
+              <button className="fyt-tile ochre" onClick={() => goTab('library')}>
+                <span className="glyph">✿</span>
+                <span className="lbl">Herbal</span>
+                <span className="ttl">Ginger &amp; magnesium for today</span>
+              </button>
+              <button className="fyt-tile lichen" onClick={() => setRideOpen(true)}>
+                <span className="glyph">◐</span>
+                <span className="lbl">Physical</span>
+                <span className="ttl">Easy pacing for your ride</span>
+              </button>
+            </div>
+          </div>
+
+          {/* did you know, research as a quick read */}
+          <div className="reveal d3" style={{ marginTop: 22 }}>
+            <DidYouKnow toast={toast} />
           </div>
 
           {/* ride prep, synced */}
@@ -151,6 +189,81 @@ export function Today({ openPaywall, toast }: { openPaywall: (ctx?: string) => v
 
       {/* detailed symptom logger */}
       <DetailedSymptom open={detailOpen} onClose={() => setDetailOpen(false)} onSave={(s) => { addFeelCheck('pain', [s.symptom], `${s.severity} · ${s.time}`); setDetailOpen(false); toast('Symptom logged.') }} />
+    </>
+  )
+}
+
+function CycleRing({ cycleDay, phase, mood, open, onTap }: { cycleDay: number; phase: string; mood?: Mood; open: boolean; onTap: () => void }) {
+  const R = 78, SW = 8, SIZE = (R + SW) * 2 + 4
+  const cx = SIZE / 2
+  const circ = 2 * Math.PI * R
+  const pct = Math.min(Math.max(cycleDay / CYCLE_LENGTH, 0.02), 1)
+  const positive = mood ? moodMeta[mood].positive : false
+  const glyph = mood ? moodMeta[mood].glyph : '◌'
+  const hint = open ? 'Tap to close' : mood ? 'Tap to update' : 'Tap to check in'
+  return (
+    <button className="cycle-ring" onClick={onTap} aria-label="Cycle day and check-in">
+      <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
+        <circle cx={cx} cy={cx} r={R} fill="none" stroke="var(--vinna-bark)" strokeWidth={SW} />
+        <circle
+          cx={cx} cy={cx} r={R} fill="none"
+          stroke="var(--vinna-rust)" strokeWidth={SW} strokeLinecap="round"
+          strokeDasharray={circ} strokeDashoffset={circ * (1 - pct)}
+          transform={`rotate(-90 ${cx} ${cx})`}
+        />
+      </svg>
+      <div className="cycle-ring-center">
+        <span className={`glyph ${positive ? 'lichen' : ''}`}>{glyph}</span>
+        <span className="day">Day {cycleDay}</span>
+        <span className="phase">{phase} phase</span>
+        <span className="hint">{hint}</span>
+      </div>
+    </button>
+  )
+}
+
+function DidYouKnow({ toast }: { toast: (m: string) => void }) {
+  const { toggleSave, isSaved } = useApp()
+  const [openId, setOpenId] = useState<string | null>(null)
+  const item = didYouKnow[0]
+  const open = didYouKnow.find(d => d.id === openId)
+
+  return (
+    <>
+      <button
+        className="card accent ochre"
+        style={{ textAlign: 'left', cursor: 'pointer', width: '100%' }}
+        onClick={() => setOpenId(item.id)}
+      >
+        <div className="row between">
+          <Eyebrow tone="ochre">{item.eyebrow}</Eyebrow>
+          <Badge tone="ochre">{item.tag}</Badge>
+        </div>
+        <p className="v-body" style={{ margin: '12px 0 12px' }}>{item.fact}</p>
+        <span className="v-meta" style={{ color: 'var(--fg-accent)' }}>Quick read →</span>
+      </button>
+
+      <Sheet open={!!open} onClose={() => setOpenId(null)}>
+        {open && (
+          <>
+            <Eyebrow tone="ochre">{open.eyebrow}</Eyebrow>
+            <h2 className="v-h2" style={{ margin: '10px 0 14px' }}>{open.fact}</h2>
+            <div className="card flat">
+              <p className="v-body-sm">{open.detail}</p>
+            </div>
+            <p className="v-meta" style={{ marginTop: 14 }}>Source · {open.source}</p>
+            <div className="stack-sm" style={{ marginTop: 18 }}>
+              <a className="btn btn-primary" href={open.url} target="_blank" rel="noreferrer">Read the full paper →</a>
+              <Btn
+                variant="secondary"
+                onClick={() => { toggleSave(open.id, 'research'); toast(isSaved(open.id) ? 'Removed from Saved.' : 'Saved to You → Saved.') }}
+              >
+                {isSaved(open.id) ? '★ Saved' : '♥ Save this'}
+              </Btn>
+            </div>
+          </>
+        )}
+      </Sheet>
     </>
   )
 }

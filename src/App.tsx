@@ -47,7 +47,7 @@ export default function App() {
         ) : (
           <>
             <div key={tab} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              {tab === 'today' && <Today openPaywall={openPaywall} toast={fireToast} />}
+              {tab === 'today' && <Today openPaywall={openPaywall} toast={fireToast} goTab={setTab} />}
               {tab === 'track' && <Track openPaywall={openPaywall} />}
               {tab === 'library' && <Library toast={fireToast} />}
               {tab === 'you' && <You openPaywall={openPaywall} toast={fireToast} />}
