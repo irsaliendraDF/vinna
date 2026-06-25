@@ -78,6 +78,8 @@ export interface Herb {
   traditional: string
   preparation: string
   caution: string
+  source: { label: string; url: string }            // clickable "where this comes from"
+  traditions: { system: string; note: string }[]    // Ayurvedic / TCM / Indigenous / modern
 }
 
 export interface Recipe {

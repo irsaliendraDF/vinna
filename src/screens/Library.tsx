@@ -162,6 +162,7 @@ function RatingStep({ questions, onDone, onSkip }: { questions: string[]; onDone
 
 /* ---------- Herb detail (raw reading) ---------- */
 function HerbDetail({ herb, onBack, toast }: { herb: Herb; onBack: () => void; toast: (m: string) => void }) {
+  const [showTraditions, setShowTraditions] = useState(false)
   return (
     <>
       <TopBar raw left={<button className="icon-btn" style={{ color: 'var(--raw-ink-2)' }} onClick={onBack}>←</button>} right={<span className="v-label" style={{ color: 'var(--raw-ink-3)' }}>Herbal</span>} />
@@ -177,10 +178,55 @@ function HerbDetail({ herb, onBack, toast }: { herb: Herb; onBack: () => void; t
           <div className="stack" style={{ marginTop: 22 }}>
             <Layer title="Traditionally used for" body={herb.traditional} />
             <Layer title="How it's prepared" body={herb.preparation} />
+
+            {/* deeper Vinna insight: traditional knowledge & research */}
+            <div className="card accent" style={{ background: 'var(--raw-card)', borderLeftColor: 'var(--vinna-rust)' }}>
+              <button
+                className="row between"
+                style={{ width: '100%', textAlign: 'left' }}
+                onClick={() => setShowTraditions(s => !s)}
+              >
+                <Eyebrow tone="rust">◆ Traditional knowledge &amp; research</Eyebrow>
+                <span style={{ color: 'var(--fg-accent)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>{showTraditions ? 'Hide' : 'Preview'}</span>
+              </button>
+              {showTraditions && (
+                <div className="reveal" style={{ marginTop: 14 }}>
+                  <div className="stack-sm">
+                    {herb.traditions.map(t => (
+                      <div key={t.system}>
+                        <p className="v-label" style={{ color: 'var(--fg-accent)', marginBottom: 4 }}>{t.system}</p>
+                        <p className="v-body-sm" style={{ color: 'var(--raw-ink-2)' }}>{t.note}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="v-body-sm" style={{ marginTop: 14, color: 'var(--raw-ink-3)', fontStyle: 'italic' }}>
+                    Vinna keeps traditional knowledge and research side by side. Some of this is tested in trials, some is
+                    long-standing practice that research has not caught up with. We label which is which, and never present
+                    tradition as proof.
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div className="card accent ochre" style={{ background: 'var(--raw-card)' }}>
               <Eyebrow tone="ochre">⚠ Honest about limits</Eyebrow>
               <p className="v-body-sm" style={{ marginTop: 10, color: 'var(--raw-ink-2)' }}>{herb.caution}</p>
             </div>
+
+            {/* clickable source */}
+            <a
+              className="list-row"
+              href={herb.source.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{ background: 'var(--raw-card)', border: '1px solid var(--raw-border)' }}
+            >
+              <span style={{ color: 'var(--fg-accent)', fontSize: 16 }}>↗</span>
+              <div className="grow">
+                <p className="v-label" style={{ color: 'var(--raw-ink-3)', marginBottom: 2 }}>Where this comes from</p>
+                <p className="v-body-sm" style={{ color: 'var(--raw-ink)' }}>{herb.source.label}</p>
+              </div>
+            </a>
           </div>
 
           <div style={{ marginTop: 24 }}>

@@ -55,6 +55,11 @@ export const herbs: Herb[] = [
       'A common form is fresh ginger steeped as a tea, taken in the first two days. Some prefer it as a standardised capsule with food.',
     caution:
       'May interact with blood-thinning medication. This is educational information, not medical advice, talk to your care team about what is right for you.',
+    source: { label: 'PubMed · ginger for period pain', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=ginger+dysmenorrhea' },
+    traditions: [
+      { system: 'Traditional Chinese Medicine', note: 'Used as a warming herb to move stagnation and ease cold-type menstrual discomfort.' },
+      { system: 'Ayurveda', note: 'Valued for kindling digestive fire (agni) and settling the stomach.' },
+    ],
   },
   {
     id: 'magnesium',
@@ -69,6 +74,11 @@ export const herbs: Herb[] = [
     preparation: 'Commonly taken in the evening, away from high-dose calcium. Start low and notice how you sleep.',
     caution:
       'High doses can loosen the stomach. Educational information only, check with your care team if you take other medication.',
+    source: { label: 'PubMed · magnesium, sleep & muscle', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=magnesium+sleep+muscle+relaxation' },
+    traditions: [
+      { system: 'Modern nutritional science', note: 'A mineral the body uses in muscle and nerve function, studied more than rooted in old tradition.' },
+      { system: 'Food traditions', note: 'Long eaten through leafy greens, seeds and whole grains across many cuisines.' },
+    ],
   },
   {
     id: 'raspberry-leaf',
@@ -82,6 +92,11 @@ export const herbs: Herb[] = [
       'Raspberry leaf is a long-standing herbal tea associated in tradition with the menstruating and reproductive years. Evidence is largely traditional rather than trial-based.',
     preparation: 'Usually a mild tea, one to two cups a day. An easy daily ritual rather than an acute remedy.',
     caution: 'If you are pregnant or trying to conceive, speak with your care team first. Educational only.',
+    source: { label: 'PubMed · raspberry leaf', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=raspberry+leaf+pregnancy' },
+    traditions: [
+      { system: 'Western herbalism', note: 'A long-standing European women\'s tonic taken as a daily tea through the reproductive years.' },
+      { system: 'Folk practice', note: 'Passed down by midwives more than tested in trials, so the evidence here is mostly traditional.' },
+    ],
   },
   {
     id: 'beetroot',
@@ -95,6 +110,11 @@ export const herbs: Herb[] = [
       'Beetroot is rich in dietary nitrate, which the body can use in the pathways behind blood flow. Endurance athletes often take it before long efforts.',
     preparation: 'A common approach is concentrated beetroot taken 2–3 hours before a long ride. Test it in training first, never on race day.',
     caution: 'Harmless reddening of urine can occur. Educational information only.',
+    source: { label: 'PubMed · beetroot nitrate & endurance', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=beetroot+nitrate+endurance+performance' },
+    traditions: [
+      { system: 'Modern sports nutrition', note: 'One of the better-studied ergogenic foods, with several trials in endurance athletes.' },
+      { system: 'Folk tradition', note: 'Long eaten as a blood-building root vegetable across Eastern European kitchens.' },
+    ],
   },
   {
     id: 'ashwagandha',
@@ -108,6 +128,11 @@ export const herbs: Herb[] = [
       'Ashwagandha is an adaptogenic root from Ayurvedic tradition, associated with a steadier response to stress and with evening calm.',
     preparation: 'Often taken as a standardised extract, morning or evening. Effects, if any, build over weeks rather than in one dose.',
     caution: 'Not recommended in pregnancy or with thyroid medication without guidance. Educational only.',
+    source: { label: 'PubMed · ashwagandha & stress', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=ashwagandha+stress+anxiety' },
+    traditions: [
+      { system: 'Ayurveda', note: 'A classic rasayana (restorative) root used to build resilience and steady the nervous system.' },
+      { system: 'Modern research', note: 'A growing set of small trials looks at stress and sleep, though quality varies.' },
+    ],
   },
   {
     id: 'iron',
@@ -121,6 +146,11 @@ export const herbs: Herb[] = [
       'The first days of a cycle are when iron stores are most drawn on. Food-first iron, red meat, lentils, leafy greens with vitamin C, is the gentlest way to replenish.',
     preparation: 'Pair plant iron with a squeeze of citrus to help absorption. Keep tea and coffee away from the meal.',
     caution: 'Only supplement iron if a test shows you need it. Educational information, not a diagnosis.',
+    source: { label: 'PubMed · dietary iron absorption', url: 'https://pubmed.ncbi.nlm.nih.gov/?term=dietary+iron+absorption+vitamin+c' },
+    traditions: [
+      { system: 'Cross-cultural food traditions', note: 'Iron-rich organ meats, lentils and dark greens feature in postpartum and recovery foods worldwide.' },
+      { system: 'Modern nutrition', note: 'Absorption and the vitamin C pairing are well established in the research.' },
+    ],
   },
 ]
 
