@@ -1,4 +1,4 @@
-import type { Herb, Recipe, Profile, NeedFilter, MealType } from './types'
+import type { Herb, Recipe, Profile, NeedFilter, MealType, LifeStage } from './types'
 
 /* The demo world: Aga, Edmonton, Day 1 Menstrual, training for an 80km Haleakalā ride. */
 export const demoProfile: Profile = {
@@ -552,6 +552,147 @@ export const shareFields = [
   { key: 'symptoms', label: 'Symptoms', desc: 'What I log day to day' },
   { key: 'health_intel', label: 'Health intelligence', desc: 'Patterns and prompts worth raising with a clinician' },
   { key: 'plan', label: 'Recovery & training plan', desc: 'What my day is built around' },
+]
+
+/* Life stages: a quick preview a tester can flip through to see how Vinna
+   adapts across a whole life, not just the menstruating years. Everything here
+   is illustrative, there is no stage-switch in the live app yet. The mental
+   health layer is an optional extra lens that applies to every stage. */
+export const lifeStages: LifeStage[] = [
+  {
+    id: 'cycling',
+    label: 'Cycling years',
+    glyph: '◑',
+    here: true,
+    tagline: 'Training with your cycle, not against it.',
+    ringGlyph: '◌',
+    marker: 'Day 1',
+    markerSub: 'Menstrual phase',
+    ringPct: 0.04,
+    context:
+      'You are on day 1, the menstrual phase. Energy often sits low here and that is your body doing exactly what it should. Vinna front-loads rest and iron-forward food.',
+    trio: [
+      { glyph: '❧', lbl: 'Nutrition', ttl: 'Iron-forward meals for Day 1' },
+      { glyph: '✿', lbl: 'Herbal', ttl: 'Ginger & magnesium for today', tone: 'ochre' },
+      { glyph: '◐', lbl: 'Physical', ttl: 'Easy pacing for your ride', tone: 'lichen' },
+    ],
+    focus: 'Vinna tunes food, herbs and training load to where you are in your cycle.',
+    mind: {
+      note: 'Low mood and irritability can track the late-luteal and early days. Naming the pattern takes some of the sting out of it.',
+      tile: { glyph: '◐', lbl: 'Mind', ttl: 'A two-minute wind-down for cramp-y evenings' },
+    },
+  },
+  {
+    id: 'conceiving',
+    label: 'Trying to conceive',
+    glyph: '✿',
+    tagline: 'Knowing your window, gently.',
+    ringGlyph: '✿',
+    marker: 'Day 13',
+    markerSub: 'Fertile window',
+    ringPct: 0.46,
+    context:
+      'You are in your fertile window. Vinna keeps the picture simple, the days that matter, steady nutrition, and the questions worth asking, without turning the month into a countdown.',
+    trio: [
+      { glyph: '❧', lbl: 'Nutrition', ttl: 'Folate-forward meals this week' },
+      { glyph: '✿', lbl: 'Herbal', ttl: 'Gentle, conception-safe options', tone: 'ochre' },
+      { glyph: '◐', lbl: 'Physical', ttl: 'Keep movement steady, not extreme', tone: 'lichen' },
+    ],
+    focus: 'Vinna leans into the fertile window, food that supports it, and calm over pressure.',
+    mind: {
+      note: 'The two-week wait can be heavy. Vinna makes room for how you feel, not just the data.',
+      tile: { glyph: '◐', lbl: 'Mind', ttl: 'A grounding note for the two-week wait' },
+    },
+  },
+  {
+    id: 'pregnancy',
+    label: 'Pregnancy',
+    glyph: '◒',
+    tagline: 'Week by week, with you.',
+    ringGlyph: '◒',
+    marker: 'Week 14',
+    markerSub: 'Second trimester',
+    ringPct: 0.5,
+    context:
+      'You are at week 14, into the second trimester. Vinna shifts to what helps now, steady iron and protein, gentle movement, and the appointments and questions worth keeping track of.',
+    trio: [
+      { glyph: '❧', lbl: 'Nutrition', ttl: 'Iron & protein for the trimester' },
+      { glyph: '✿', lbl: 'Herbal', ttl: 'Pregnancy-safe, care-team first', tone: 'ochre' },
+      { glyph: '◐', lbl: 'Physical', ttl: 'Gentle movement that feels good', tone: 'lichen' },
+    ],
+    focus: 'Vinna follows the trimesters, food, safe movement, and what to raise at each visit.',
+    mind: {
+      note: 'Mood shifts in pregnancy are common and worth voicing. Vinna keeps a quiet space to notice them.',
+      tile: { glyph: '◐', lbl: 'Mind', ttl: 'Checking in with how you actually feel' },
+    },
+  },
+  {
+    id: 'postpartum',
+    label: 'Postpartum',
+    glyph: '○',
+    tagline: 'Recovery counts as training.',
+    ringGlyph: '○',
+    marker: 'Week 6',
+    markerSub: 'Fourth trimester',
+    ringPct: 0.2,
+    context:
+      'You are six weeks in. Sleep is broken and your body is rebuilding. Vinna keeps it kind, easy nutrition, a slow return to movement, and a gentle eye on mood and recovery.',
+    trio: [
+      { glyph: '❧', lbl: 'Nutrition', ttl: 'Easy, iron-forward one-handed meals' },
+      { glyph: '✿', lbl: 'Herbal', ttl: 'Feeding-safe options', tone: 'ochre' },
+      { glyph: '◐', lbl: 'Physical', ttl: 'Rebuild slowly, floor first', tone: 'lichen' },
+    ],
+    focus: 'Vinna leans into recovery, feeding-friendly food, sleep, and an unhurried return to movement.',
+    mind: {
+      note: 'Postpartum mood deserves real attention. Vinna helps you notice what to raise with your care team.',
+      tile: { glyph: '◐', lbl: 'Mind', ttl: 'A quick check on how today felt' },
+    },
+  },
+  {
+    id: 'perimenopause',
+    label: 'Perimenopause',
+    glyph: '◓',
+    tagline: 'The change, on your terms.',
+    ringGlyph: '◓',
+    marker: '38 days',
+    markerSub: 'Cycle lengthening',
+    ringPct: 0.82,
+    context:
+      'Your cycles are getting less predictable and sleep and temperature may be shifting. Vinna stops assuming a tidy 28 days and starts tracking what is actually changing for you.',
+    trio: [
+      { glyph: '❧', lbl: 'Nutrition', ttl: 'Protein & bone-supportive food' },
+      { glyph: '✿', lbl: 'Herbal', ttl: 'Options studied for this stage', tone: 'ochre' },
+      { glyph: '◐', lbl: 'Physical', ttl: 'Strength moves to the centre', tone: 'lichen' },
+    ],
+    focus: 'Vinna leans into strength, sleep, bone and steady energy as cycles change.',
+    mind: {
+      note: 'Mood, focus and anxiety can shift in perimenopause. Vinna treats that as part of the picture, not a side note.',
+      tile: { glyph: '◐', lbl: 'Mind', ttl: 'Naming the brain-fog and mood days' },
+    },
+  },
+  {
+    id: 'menopause',
+    label: 'Menopause & beyond',
+    glyph: '✦',
+    tagline: 'Strong, for the long run.',
+    ringGlyph: '✦',
+    marker: 'Steady',
+    markerSub: 'Post-menopause',
+    ringPct: 1,
+    positive: true,
+    context:
+      'Periods are behind you. Vinna turns to the long game, strength, bone, heart and sleep, with food and movement that keep you doing what you love.',
+    trio: [
+      { glyph: '❧', lbl: 'Nutrition', ttl: 'Protein, calcium & heart-smart food' },
+      { glyph: '✿', lbl: 'Herbal', ttl: 'Evidence-first options', tone: 'ochre' },
+      { glyph: '◐', lbl: 'Physical', ttl: 'Lift heavy-ish, keep moving', tone: 'lichen' },
+    ],
+    focus: 'Vinna leans into strength, bone, heart and sleep for the decades ahead.',
+    mind: {
+      note: 'Sleep and mood often travel together here. Vinna keeps both in view.',
+      tile: { glyph: '◐', lbl: 'Mind', ttl: 'Protecting sleep and a steady mood' },
+    },
+  },
 ]
 
 export const tiers = [

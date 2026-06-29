@@ -6,6 +6,7 @@ import { FeelCheck } from '../components/FeelCheck'
 import { Eyebrow, Btn, Badge, Sheet } from '../components/ui'
 import { FeedbackAutoPrompt } from '../components/Feedback'
 import { JournalCard } from '../components/Journal'
+import { LifeStagesCard } from '../components/LifeStages'
 import { FerritinInsightSheet } from '../components/HealthInsight'
 import { symptomSets, didYouKnow, moodMeta } from '../lib/data'
 import type { Mood } from '../lib/types'
@@ -99,6 +100,11 @@ export function Today({ openPaywall, toast, goTab }: { openPaywall: (ctx?: strin
           {/* did you know, research as a quick read */}
           <div className="reveal d3" style={{ marginTop: 22 }}>
             <DidYouKnow toast={toast} />
+          </div>
+
+          {/* life stages, a quick preview that Vinna grows with you */}
+          <div className="reveal d3" style={{ marginTop: 16 }}>
+            <LifeStagesCard />
           </div>
 
           {/* ride prep, synced */}

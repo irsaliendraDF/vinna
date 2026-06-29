@@ -67,6 +67,29 @@ export interface SavedItem {
   createdAt: string
 }
 
+/* Life-stage preview. Illustrative only: lets a tester flip through how Vinna
+   adapts across life, so it reads as a whole-life app, not just a period tracker.
+   The mental-health layer (`mind`) is an optional extra lens on any stage. */
+export interface LifeStage {
+  id: string
+  label: string                 // chip label
+  glyph: string                 // mono glyph
+  here?: boolean                // marks the stage the demo user is in now
+  tagline: string               // Playfair italic line
+  ringGlyph: string             // centre glyph for the mini ring
+  marker: string                // big centre text, e.g. "Day 1", "Week 14"
+  markerSub: string             // small phase label under the marker
+  ringPct: number               // 0..1, illustrative ring fill
+  positive?: boolean            // centre glyph colour (lichen vs rust)
+  context: string               // the contextual home paragraph for this stage
+  trio: { glyph: string; lbl: string; ttl: string; tone?: 'ochre' | 'lichen' }[]
+  focus: string                 // "what Vinna leans into" note
+  mind: {                       // the mental-health layer for this stage
+    note: string
+    tile: { glyph: string; lbl: string; ttl: string }
+  }
+}
+
 export interface Herb {
   id: string
   name: string

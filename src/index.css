@@ -533,6 +533,59 @@ input, select, textarea { font-family: inherit; }
 .fyt-tile .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--fg-3); }
 .fyt-tile .ttl { font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--fg-1); line-height: 1.3; }
 
+/* Life stages preview */
+.ls-glyph-row { display: flex; gap: 10px; }
+.ls-glyph-pip {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1;
+  color: var(--fg-3);
+  opacity: 0.6;
+}
+.ls-glyph-pip.on { color: var(--vinna-rust); opacity: 1; }
+.ls-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 6px 0 2px;
+}
+.ls-ring svg { display: block; }
+.ls-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  pointer-events: none;
+}
+.ls-center .ls-glyph {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--vinna-rust);
+  margin-bottom: 5px;
+}
+.ls-center .ls-glyph.lichen { color: var(--vinna-lichen); }
+.ls-center .ls-big {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 1px;
+  line-height: 0.9;
+  color: var(--fg-1);
+  text-transform: uppercase;
+}
+.ls-center .ls-sub {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-top: 2px;
+}
+
 /* Challenge progress bar (Community) */
 .progress-bar {
   height: 6px;
